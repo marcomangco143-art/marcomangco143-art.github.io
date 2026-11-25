@@ -1,0 +1,2665 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, minimum-scale=1, user-scalable=no, interactive-widget=resizes-content">
+  <meta name="description" content="Ink-Lite — a lightweight, local-first notebook for notes and to-do lists.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2133637004786820" crossorigin="anonymous"></script>
+  <title>Ink-Lite</title>
+  <style>
+    :root { color-scheme: light dark; box-sizing: border-box; }
+    html { scroll-padding-top: env(safe-area-inset-top, 0px); background: var(--paper); }
+    body { margin: 0; padding: 0; font: 14px -apple-system, BlinkMacSystemFont, sans-serif; background: var(--paper); color: #000; }
+    img { max-width: 100%; }
+    [hidden]:not([hidden="until-found" i]) { display: none !important; }
+  </style>
+  <style>
+    :root { --paper: #f8fafc; --surface: #ffffff; --surface-2: #f1f5f9; --ink: #0f172a; --ink-2: #334155; --muted: #64748b; --line: #e2e8f0; --line-strong: #cbd5e1; --accent: #2563eb; --accent-soft: #eff6ff; --danger: #ef4444; --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; --font-title: var(--font-serif); --font-body: var(--font-serif); --shadow: 0 4px 12px rgba(0,0,0,.05), 0 10px 28px -14px rgba(0,0,0,.1); --shadow-lg: 0 10px 40px -10px rgba(0,0,0,0.15); }
+    html[data-theme="coal"] { --paper: #0d1117; --surface: #161b22; --surface-2: #21262d; --ink: #e6edf3; --ink-2: #c9d1d9; --muted: #8b949e; --line: #30363d; --line-strong: #484f58; --accent: #58a6ff; --accent-soft: rgba(88, 166, 255, 0.15); --danger: #f85149; --shadow: 0 4px 12px rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.5); --shadow-lg: 0 10px 40px -10px rgba(0,0,0,0.6); }
+    html[data-font="serif"] { --font-title: var(--font-serif); --font-body: var(--font-serif); }
+    html[data-font="sans"] { --font-title: var(--font-ui); --font-body: var(--font-ui); }
+    *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body { margin: 0; overflow: hidden; background: var(--paper); color: var(--ink); font-family: var(--font-ui); font-size: 14px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; transition: background .3s ease, color .3s ease; }
+    button { font-family: inherit; outline: none; border: none; background: none; cursor: pointer; color: inherit; }
+    svg { width: 20px; height: 20px; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; fill: none; stroke: currentColor; }
+    * { scrollbar-width: none; -ms-overflow-style: none; }
+    *::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+    .loader { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; background: var(--paper); transition: opacity .5s ease, visibility .5s ease; }
+    .loader.is-done { opacity: 0; visibility: hidden; pointer-events: none; }
+    .loader-inner { text-align: center; }
+    .loader-mark { font-family: var(--font-serif); font-size: 32px; font-weight: 600; color: var(--ink); }
+    .loader-rule { width: 132px; height: 1px; background: var(--line-strong); margin: 16px auto; }
+    .loader-bar { width: 184px; height: 3px; background: var(--line); overflow: hidden; border-radius: 3px; }
+    .loader-bar span { display: block; height: 100%; width: 0; background: var(--accent); animation: loaderFill 1.5s cubic-bezier(.32,.72,.36,1) forwards; }
+    @keyframes loaderFill { from { width: 0; } to { width: 100%; } }
+    .app { display: grid; grid-template-columns: 360px minmax(0, 1fr); height: 100dvh; background: var(--paper); }
+    .app[hidden] { display: none; }
+    .sidebar { display: flex; flex-direction: column; min-height: 0; background: var(--surface-2); border-right: 1px solid var(--line); position: relative; }
+    .sidebar-head { display: flex; align-items: center; gap: 8px; padding: 18px; }
+    .brand { display: flex; flex-direction: column; line-height: 1.1; margin-right: auto; }
+    .brand-mark { font-family: var(--font-serif); font-size: 20px; font-weight: 600; }
+    .brand-sub { font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-top: 4px; font-weight: 600; }
+    .search-wrap { padding: 0 18px 16px; }
+    .search { position: relative; }
+    .search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--muted); pointer-events: none; }
+    .search input { width: 100%; padding: 10px 12px 10px 38px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font-size: 14px; transition: border-color .2s, box-shadow .2s; }
+    .search input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .filters { display: flex; gap: 6px; padding: 0 18px 16px; }
+    .filters button { flex: 1; padding: 8px; border: 1px solid transparent; border-radius: 8px; font-size: 13px; color: var(--muted); font-weight: 600; transition: color .2s, background .2s, border-color .2s, box-shadow .2s; }
+    .filters button:hover { color: var(--ink); }
+    .filters button[aria-pressed="true"] { background: var(--surface); border-color: var(--line); color: var(--ink); box-shadow: var(--shadow); }
+    .note-list { flex: 1; min-height: 0; overflow-y: auto; padding: 0 18px 120px; scrollbar-gutter: stable; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-content: start; }
+    .note-item { display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; width: 100%; min-width: 0; height: auto; min-height: 140px; padding: 14px 14px 12px; text-align: left; font: inherit; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; user-select: none; transition: background .2s, border-color .2s, box-shadow .2s; }
+    .note-item:hover { background: var(--surface-2); box-shadow: var(--shadow); }
+    .note-item[aria-current="true"] { background: var(--surface-2); border-color: var(--accent); box-shadow: var(--shadow); }
+    .note-item-top { display: flex; align-items: flex-start; gap: 8px; flex: none; }
+    .note-title { flex: 1; min-width: 0; font-family: var(--font-title); font-size: 15px; font-weight: 600; color: var(--ink); line-height: 1.35; padding-bottom: 1px; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; word-break: normal; }
+    .note-icons { display: flex; gap: 4px; align-items: center; flex-shrink: 0; height: 20px; }
+    .indicator-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+    .indicator-lock { display: flex; }
+    .indicator-lock svg { width: 12px; height: 12px; color: var(--muted); }
+    .note-preview { flex: 1 0 auto; margin-top: 8px; padding-bottom: 1px; font-size: 12px; line-height: 1.5; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+    .note-meta { flex: none; display: flex; align-items: center; gap: 6px; margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--line); font-size: 10.5px; line-height: 1.2; color: var(--muted); font-weight: 600; white-space: nowrap; overflow: hidden; }
+    .note-meta span { min-width: 0; text-overflow: ellipsis; overflow: hidden; }
+    .meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--line-strong); flex-shrink: 0; }
+    .sidebar-foot { flex: none; padding: 16px 18px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); font-weight: 500; text-align: center; }
+    .fab-container { position: absolute; bottom: calc(var(--foot-h, 64px) + 12px); right: 20px; z-index: 20; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+    .fab-menu { display: flex; flex-direction: column; gap: 10px; opacity: 0; pointer-events: none; transform: translateY(20px) scale(.9); transition: opacity .3s cubic-bezier(.34,1.56,.64,1), transform .3s cubic-bezier(.34,1.56,.64,1); }
+    .fab-menu.is-open { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+    .fab-action { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); padding: 10px 16px; border-radius: 24px; box-shadow: var(--shadow); color: var(--ink); font-weight: 600; font-size: 13px; transition: background .2s, transform .2s; }
+    .fab-action:hover { background: var(--surface-2); transform: translateX(-4px); }
+    .fab-action svg { width: 16px; height: 16px; }
+    .fab { width: 56px; height: 56px; background: var(--accent); color: #fff; border-radius: 16px; display: grid; place-items: center; box-shadow: 0 4px 16px rgba(37, 99, 235, .3); transition: background .4s, transform .4s cubic-bezier(.34,1.56,.64,1), border-radius .4s, color .4s, box-shadow .4s; }
+    .fab svg { width: 24px; height: 24px; stroke-width: 2.5; transition: transform .4s ease; }
+    .fab:hover { background: #1d4ed8; }
+    .fab.is-open { transform: rotate(90deg); border-radius: 50%; background: var(--surface); color: var(--ink); border: 1px solid var(--line); box-shadow: var(--shadow); }
+    .main { min-width: 0; display: flex; flex-direction: column; background: var(--surface); overflow: hidden; position: relative; }
+    .editor { display: flex; flex-direction: column; height: 100%; }
+    .editor-bar { display: flex; align-items: center; gap: 8px; padding: 12px 20px; border-bottom: 1px solid var(--line); background: var(--surface); flex: none; }
+    .type-chip { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; font-weight: 700; }
+    .save-status { font-size: 12px; font-weight: 500; color: var(--muted); }
+    .bar-spacer { flex: 1; }
+    .icon-btn { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; color: var(--ink-2); transition: background .2s, color .2s; }
+    .icon-btn:hover { background: var(--surface-2); color: var(--ink); }
+    .icon-btn.is-on { color: var(--accent); background: var(--accent-soft); }
+    .icon-btn.danger:hover { color: var(--danger); background: var(--accent-soft); }
+    .icon-btn svg { width: 18px; height: 18px; }
+    #btnManualSave { color: #10b981; background: #ecfdf5; border: 1px solid #a7f3d0; display: none; }
+    html[data-theme="coal"] #btnManualSave { background: #064e3b; border-color: #047857; color: #34d399; }
+    .editor-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; overscroll-behavior: contain; scrollbar-gutter: stable; }
+    .sheet { max-width: 760px; width: 100%; margin: 0 auto; padding: 24px 24px 60px; display: flex; flex-direction: column; }
+    .title-input { width: 100%; border: 0; background: transparent; padding: 0 0 12px 0; font-family: var(--font-title); font-size: 32px; font-weight: 700; color: var(--ink); border-bottom: 1px solid transparent; transition: border-color .2s; }
+    .title-input::placeholder { color: var(--muted); opacity: .5; }
+    .title-input:focus { outline: none; border-bottom-color: var(--line-strong); }
+    .editor-body { margin-top: 10px; display: flex; flex-direction: column; }
+    .body-input { width: 100%; min-height: 150px; border: 0; background: transparent; resize: none; font-family: var(--font-body); font-size: 16.5px; line-height: 1.7; color: var(--ink-2); overflow-y: hidden; }
+    .body-input::placeholder { color: var(--muted); opacity: .5; }
+    .body-input:focus { outline: none; }
+    .todo-list { display: flex; flex-direction: column; gap: 4px; }
+    .todo-row { display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: 8px; transition: background .2s; }
+    .todo-row:hover { background: var(--surface-2); }
+    .check { width: 20px; height: 20px; flex: none; border: 2px solid var(--line-strong); border-radius: 6px; display: flex; align-items: center; justify-content: center; padding: 0; color: transparent; transition: border-color .2s, background .2s, color .2s; }
+    .check svg { display: block; width: 14px; height: 14px; stroke-width: 3; }
+    .check:hover { border-color: var(--accent); }
+    .todo-row.is-done .check { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .todo-text { flex: 1; min-width: 0; border: 0; background: transparent; font-family: var(--font-body); font-size: 15px; color: var(--ink); }
+    .todo-text:focus { outline: none; }
+    .todo-row.is-done .todo-text { color: var(--muted); text-decoration: line-through; }
+    .todo-add { display: flex; align-items: center; gap: 12px; padding: 8px; margin-top: 4px; color: var(--muted); }
+    .todo-add-input { flex: 1; border: 0; background: transparent; font-family: var(--font-body); font-size: 15px; color: var(--ink); }
+    .todo-add-input:focus { outline: none; }
+    .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px; }
+    .empty-mark { font-family: var(--font-serif); font-size: 32px; font-weight: 700; color: var(--ink); margin-bottom: 12px; }
+    .empty p { font-size: 14px; color: var(--muted); max-width: 300px; line-height: 1.6; text-wrap: pretty; }
+    .editor.is-locked .title-input, .editor.is-locked .body-input, .editor.is-locked .todo-row, .editor.is-locked .todo-add { pointer-events: none; opacity: .5; }
+    .unlock-banner { display: flex; justify-content: space-between; align-items: center; background: var(--surface-2); border: 1px solid var(--line-strong); padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; transition: opacity .2s; }
+    .btn:hover { opacity: .9; }
+    .btn.primary { background: var(--accent); color: #fff; }
+    .btn.ghost { background: var(--surface-2); border: 1px solid var(--line); color: var(--ink); }
+    .btn.danger { background: var(--danger); color: #fff; }
+    .btn:disabled { opacity: .6; cursor: default; }
+    dialog.modal { border: 1px solid var(--line); border-radius: 16px; padding: 0; background: var(--surface); color: var(--ink); width: calc(100vw - 40px); max-width: 500px; max-height: 85vh; overflow: hidden; box-shadow: var(--shadow-lg); margin: auto; font: inherit; }
+    dialog.modal[open] { display: flex; flex-direction: column; }
+    dialog.modal::backdrop { background: rgba(0, 0, 0, .5); backdrop-filter: blur(4px); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--line); flex: none; background: var(--surface); z-index: 10; }
+    .modal-header h2 { margin: 0; font-family: var(--font-serif); font-size: 22px; font-weight: 700; }
+    .modal-body { overflow-y: auto; flex: 1; padding: 24px; scrollbar-gutter: stable; }
+    .settings-view { display: none; animation: slideIn .2s ease; }
+    .settings-view.active { display: block; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+    .settings-menu-item { display: flex; align-items: center; padding: 16px 24px; gap: 16px; border-bottom: 1px solid var(--line); cursor: pointer; transition: background .2s; }
+    .settings-menu-item:hover { background: var(--surface-2); }
+    .settings-menu-item:last-child { border-bottom: none; }
+    .smi-icon { width: 24px; height: 24px; color: var(--accent); flex: none; display: flex; align-items: center; justify-content: center; }
+    .smi-text { flex: 1; font-size: 16px; font-weight: 600; color: var(--ink); }
+    .smi-chevron { color: var(--muted); font-size: 20px; font-weight: 400; transition: transform .2s, color .2s; }
+    .settings-menu-item:hover .smi-chevron { transform: translateX(3px); color: var(--ink); }
+    .subpage-header { display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--line); gap: 12px; position: sticky; top: 0; background: var(--surface); z-index: 10; }
+    .subpage-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--ink-2); cursor: pointer; transition: background .2s, color .2s; }
+    .subpage-back:hover { background: var(--surface-2); color: var(--ink); }
+    .subpage-title { font-family: var(--font-serif); font-size: 20px; font-weight: 700; margin: 0; color: var(--ink); }
+    .setting-group { margin-bottom: 28px; }
+    .setting-group:last-child { margin-bottom: 0; }
+    .setting-group-title { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; margin-bottom: 12px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+    .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; gap: 16px; }
+    .setting-label { font-size: 15px; font-weight: 600; color: var(--ink); }
+    .setting-desc { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex: none; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--line-strong); transition: .3s; border-radius: 24px; }
+    .slider::before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: #fff; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,.2); }
+    .switch input:checked + .slider { background-color: var(--accent); }
+    .switch input:checked + .slider::before { transform: translateX(20px); }
+    .switch input:disabled + .slider { opacity: .45; cursor: not-allowed; }
+    .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .option-btn { padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); font-size: 14px; font-weight: 600; color: var(--ink); text-align: center; transition: border-color .2s, background .2s, color .2s, box-shadow .2s; }
+    .option-btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    .add-method-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); display: flex; align-items: center; justify-content: center; color: var(--accent); cursor: pointer; transition: background .2s, border-color .2s; }
+    .add-method-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
+    .add-method-btn svg { width: 16px; height: 16px; stroke-width: 2.5; }
+    .fb-input, .fb-textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); color: var(--ink); font-family: var(--font-ui); font-size: 14px; transition: border-color .2s, box-shadow .2s, background .2s; }
+    .fb-textarea { min-height: 130px; line-height: 1.55; resize: vertical; }
+    .fb-input:focus, .fb-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); background: var(--surface); }
+    .fb-input::placeholder, .fb-textarea::placeholder { color: var(--muted); opacity: .7; }
+    .lock-screen { --key-size: 76px; position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; background: var(--paper); overflow-y: auto; overscroll-behavior: contain; padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom)); }
+    .lock-screen[hidden] { display: none !important; }
+    .lock-inner { flex: 1 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 320px; margin: 0 auto; }
+    .lock-badge { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); margin-bottom: 16px; }
+    .lock-badge svg { width: 24px; height: 24px; stroke-width: 1.8; }
+    .lock-title { font-family: var(--font-serif); font-size: 32px; font-weight: 700; line-height: 1.1; color: var(--ink); }
+    .lock-sub { margin-top: 8px; font-size: 13px; color: var(--muted); font-weight: 500; letter-spacing: .02em; }
+    .pin-dots { display: flex; gap: 18px; margin: 28px 0 6px; }
+    .pin-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line-strong); transition: background .2s, border-color .2s, transform .2s; }
+    .pin-dot.filled { background: var(--accent); border-color: var(--accent); transform: scale(1.1); }
+    .pin-dot.error { border-color: var(--danger); background: var(--danger); animation: shake .3s ease; }
+    .lock-msg { min-height: 20px; margin-bottom: 14px; font-size: 13px; font-weight: 600; color: var(--danger); text-align: center; line-height: 1.35; }
+    .keypad { display: grid; grid-template-columns: repeat(3, var(--key-size)); justify-content: space-between; row-gap: 16px; width: 100%; max-width: 300px; margin: 0 auto 20px; }
+    .key-btn { width: var(--key-size); height: var(--key-size); aspect-ratio: 1 / 1; border-radius: 50%; padding: 0; flex: none; display: grid; place-items: center; font-size: 28px; font-weight: 400; line-height: 1; font-variant-numeric: tabular-nums; background: var(--surface-2); color: var(--ink); border: 1px solid var(--line); touch-action: manipulation; user-select: none; -webkit-user-select: none; transition: background .12s ease, transform .12s ease, opacity .2s; }
+    .key-btn:active { background: var(--line-strong); transform: scale(.94); }
+    @media (hover: hover) { .key-btn:hover { background: var(--line); } }
+    .key-btn.action { background: transparent; border-color: transparent; font-size: 16px; font-weight: 600; }
+    .key-btn.action:active { background: var(--surface-2); }
+    .key-btn.action svg { width: 26px; height: 26px; stroke-width: 1.6; }
+    .key-btn:disabled { opacity: .5; }
+    .link-btn { margin-top: 4px; padding: 10px 14px; font-size: 14px; font-weight: 500; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; border-radius: 8px; }
+    .link-btn:hover { color: var(--ink); }
+    @media (max-height: 720px) { .lock-screen { --key-size: 66px; } .key-btn { font-size: 25px; } .keypad { row-gap: 12px; margin-bottom: 12px; } .pin-dots { margin-top: 20px; } .lock-badge { width: 48px; height: 48px; margin-bottom: 12px; } .lock-title { font-size: 28px; } }
+    @media (max-height: 600px) { .lock-screen { --key-size: 56px; } .key-btn { font-size: 22px; } .lock-badge { display: none; } }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+    .setup-pin-input { width: 100%; padding: 14px; font-size: 24px; text-align: center; letter-spacing: .2em; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); color: var(--ink); font-family: ui-monospace, monospace; }
+    .setup-pin-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .spinner { width: 24px; height: 24px; border: 3px solid rgba(37,99,235,.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (max-width: 880px) {
+      .app { grid-template-columns: 1fr; } .sidebar { display: flex; } .main { display: none; }
+      .app.viewing .sidebar { display: none; } .app.viewing .main { display: flex; }
+      dialog.modal { width: 100vw !important; max-width: 100vw !important; height: 100vh !important; height: 100dvh !important; max-height: 100vh !important; max-height: 100dvh !important; border-radius: 0 !important; border: none !important; }
+      .modal-header { padding-top: max(20px, env(safe-area-inset-top)); }
+      .modal-body { padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+    }
+    @media (max-width: 340px) { .note-list { grid-template-columns: minmax(0, 1fr); } }
+    .ai-msg { padding: 8px 12px; border-radius: 10px; max-width: 88%; line-height: 1.45; font-size: 13px; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: anywhere; }
+    .ai-msg.user { background: var(--accent); color: #fff; align-self: flex-end; }
+    .ai-msg.assistant { background: var(--surface); color: var(--ink); align-self: flex-start; border: 1px solid var(--line); }
+    .ai-msg.error { background: var(--accent-soft); color: var(--danger); align-self: flex-start; border: 1px solid var(--danger); }
+
+    /* Keyboard + top strip fixes */
+    html { height: 100%; overflow: hidden; background: var(--paper); }
+    body { position: fixed; inset: 0; width: 100%; height: var(--vvh, 100%); overflow: hidden; background: var(--paper); }
+    .app { height: var(--vvh, 100dvh); }
+    @media (max-width: 880px) {
+      dialog.modal { height: var(--vvh, 100dvh) !important; max-height: var(--vvh, 100dvh) !important; background: var(--surface); }
+    }
+    dialog.modal::backdrop { background: rgba(15, 23, 42, .45); }
+    input, textarea, select { background-clip: padding-box; }
+    input:-webkit-autofill, input:-webkit-autofill:focus, textarea:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px var(--surface-2) inset !important; -webkit-text-fill-color: var(--ink) !important; caret-color: var(--ink); transition: background-color 9999s ease-out 0s; }
+    input, textarea { -webkit-tap-highlight-color: transparent; }
+    #aiChatMessages .ai-msg { font-size: 14px; max-width: 90%; }
+    #aiChatModal { overflow: hidden; }
+
+    /* Lower top: keep headers clear of the status bar / clock / battery */
+    :root { --top-gap: calc(max(env(safe-area-inset-top, 0px), 24px) + 12px); }
+    .sidebar-head { padding-top: var(--top-gap); }
+    .editor-bar { padding-top: calc(var(--top-gap) - 4px); }
+    .subpage-header { padding-top: var(--top-gap); }
+    @media (max-width: 880px) {
+      .modal-header { padding-top: var(--top-gap); }
+    }
+
+    /* Keyboard gap fix: modals/app follow the real viewport via CSS, not a stale JS height */
+    body { height: auto; }
+    .app { height: 100%; }
+    @media (max-width: 880px) {
+      dialog.modal { position: fixed !important; inset: 0 0 var(--kb, 0px) 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; height: auto !important; max-height: none !important; }
+      dialog.modal::backdrop { background: var(--paper); }
+      .modal-header { padding-top: calc(max(env(safe-area-inset-top, 0px), 16px) + 10px); }
+    }
+
+    /* Popups: soft themed surface instead of plain white */
+    dialog.modal { background: var(--paper); border-color: var(--line); }
+    .modal-header { background: var(--paper); }
+    dialog.modal .fb-input, dialog.modal .fb-textarea { background: var(--surface); border-color: var(--line-strong); }
+    dialog.modal .option-btn { background: var(--surface); }
+    dialog.modal .option-btn[aria-pressed="true"] { background: var(--accent-soft); }
+    #aiChatMessages { background: var(--paper) !important; }
+    .ai-msg { border-radius: 14px; box-shadow: 0 1px 2px rgba(15, 23, 42, .06); }
+    .ai-msg.assistant { background: var(--surface); }
+
+    /* Settings pages must scroll: the active page fills the popup and its body scrolls */
+    dialog.modal[open] > .settings-view.active { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+    dialog.modal[open] > .settings-view.active > .modal-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding-bottom: max(32px, env(safe-area-inset-bottom)); }
+    dialog.modal[open] > .settings-view.active > .modal-header, dialog.modal[open] > .settings-view.active > .subpage-header { flex: none; }
+    #settingsModal { overflow: hidden; }
+    .subpage-header { background: var(--paper); }
+
+    /* In-app pickers (replace the plain white system dropdown) */
+    .pick { display: flex; flex-direction: column; gap: 10px; }
+    .pick-item { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 14px; border: 1px solid var(--line-strong); border-radius: 14px; background: var(--surface); color: var(--ink); transition: border-color .2s, background .2s, box-shadow .2s; }
+    .pick-item[aria-checked="true"] { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 1px var(--accent); }
+    .pick-radio { flex: none; width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--line-strong); display: grid; place-items: center; }
+    .pick-item[aria-checked="true"] .pick-radio { border-color: var(--accent); }
+    .pick-item[aria-checked="true"] .pick-radio::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+    .pick-text { flex: 1; min-width: 0; }
+    .pick-title { font-family: var(--font-ui); font-size: 15px; font-weight: 600; display: flex; justify-content: space-between; gap: 8px; }
+    .pick-title small { font-weight: 500; color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .pick-desc { font-size: 12.5px; line-height: 1.4; color: var(--muted); margin-top: 3px; }
+    .seg { display: flex; gap: 8px; }
+    .seg-item { flex: 1; padding: 10px 6px; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface); color: var(--ink); font-size: 14px; font-weight: 600; text-align: center; }
+    .seg-item small { display: block; font-size: 11px; font-weight: 500; color: var(--muted); margin-top: 2px; }
+    .seg-item[aria-checked="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+    /* Cleaner letters */
+    :root {
+      --font-ui: Inter, "SF Pro Text", Roboto, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+      --font-serif: "Source Serif 4", "Noto Serif", "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
+    }
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    body { text-rendering: optimizeLegibility; font-kerning: normal; -webkit-font-smoothing: antialiased; }
+    .modal-header h2, .subpage-title, .lock-title, .empty-mark, #fbTitle { font-weight: 600 !important; letter-spacing: -0.01em; }
+    .title-input { font-weight: 600; letter-spacing: -0.015em; }
+    .brand-mark, .note-title { letter-spacing: -0.005em; }
+    .note-title { font-size: 15.5px; }
+    .ai-msg, #aiChatMessages .ai-msg { font-family: var(--font-ui); font-size: 15px; line-height: 1.55; letter-spacing: 0; }
+    .fb-input, .fb-textarea { font-family: var(--font-ui); letter-spacing: 0; }
+  </style>
+<style>
+/* ===== Fixes ===== */
+html,body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation;-webkit-text-size-adjust:100%}
+input,textarea{-webkit-user-select:text;user-select:text}
+.editor input,.editor textarea{-webkit-touch-callout:default}
+html,body{background:var(--surface)}
+:root{--top-gap:calc(env(safe-area-inset-top,0px) + 10px)}
+.editor-bar{padding-top:calc(env(safe-area-inset-top,0px) + 6px);padding-bottom:6px}
+@media (max-width:880px){.modal-header{padding-top:calc(env(safe-area-inset-top,0px) + 8px)}dialog.modal{inset:0 !important}}
+/* ===== Beta ===== */
+.bx-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.bx-card h3{margin:0 0 6px;font-size:15px}.bx-card p,.bx-card li{font-size:13px;line-height:1.5;color:var(--muted);margin:0 0 8px}
+.bx-card ul{padding-left:18px;margin:0}
+.bx-btn{width:100%;padding:13px;border-radius:12px;border:0;background:var(--accent);color:#fff;font-weight:600;font-size:14px;margin-top:6px}
+.bx-btn.ghost{background:var(--surface-2);color:var(--ink);border:1px solid var(--line-strong)}
+.bx-btn:disabled{opacity:.45}
+.bx-bar{height:8px;border-radius:8px;background:var(--line);overflow:hidden;margin:12px 0 8px}.bx-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .5s linear}
+.bx-chk{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ink-2);margin:10px 0;line-height:1.4}.bx-chk input{margin-top:2px;width:18px;height:18px;flex:none}
+.bx-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;padding:3px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent);margin-bottom:8px}
+.bx-ov{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;background:radial-gradient(120% 80% at 20% 10%,#6d5dfc 0,transparent 55%),radial-gradient(100% 70% at 90% 90%,#00c6ff 0,transparent 55%),linear-gradient(160deg,#0f172a,#1e1b4b);transition:opacity .4s}
+.bx-ov.out{opacity:0}
+.bx-logo{font-size:34px;font-weight:700;letter-spacing:-.02em}.bx-sub{font-size:12px;letter-spacing:.2em;opacity:.75;margin-top:6px}
+.bx-load{width:180px;height:4px;border-radius:4px;background:rgba(255,255,255,.2);margin-top:28px;overflow:hidden}.bx-load i{display:block;height:100%;background:#fff;animation:bxLoad 3.5s linear forwards}
+@keyframes bxLoad{from{width:0}to{width:100%}}
+.bx-man{width:100%;max-width:360px;overflow:hidden;border-radius:24px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);backdrop-filter:blur(24px) saturate(170%);-webkit-backdrop-filter:blur(24px) saturate(170%)}
+.bx-track{display:flex;transition:transform .45s cubic-bezier(.22,1,.36,1)}
+.bx-slide{flex:none;width:100%;padding:30px 24px;box-sizing:border-box;text-align:center;min-height:230px}.bx-slide h2{margin:0 0 10px;font-size:22px}.bx-slide p{margin:0;font-size:14px;line-height:1.55;opacity:.9}
+.bx-dots{display:flex;gap:8px;justify-content:center;margin:16px 0 4px}.bx-dots b{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.35);transition:.3s}.bx-dots b.on{background:#fff;width:20px;border-radius:6px}
+.bx-row{display:flex;gap:10px;padding:0 20px 20px}.bx-row button{flex:1;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.16);color:#fff;font-weight:600}
+.bx-form{width:min(92%,360px);background:var(--surface);color:var(--ink);border-radius:20px;padding:20px;max-height:90%;overflow:auto}.bx-form h3{margin:0 0 4px}.bx-form p{font-size:12px;color:var(--muted);margin:0 0 12px}
+.bx-form input,.bx-form textarea{width:100%;box-sizing:border-box;padding:12px;margin-bottom:10px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface-2);color:var(--ink);font:inherit}
+.bx-form .bx-err{color:var(--danger);font-size:12px;min-height:16px;margin-bottom:6px}
+html[data-beta="1"] .lock-screen{background:radial-gradient(120% 80% at 15% 8%,#6d5dfc 0,transparent 55%),radial-gradient(100% 70% at 90% 92%,#00c6ff 0,transparent 55%),linear-gradient(160deg,#0f172a,#1e1b4b)!important}
+html[data-beta="1"] .lock-screen::before,html[data-beta="1"] .lock-screen::after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;filter:blur(46px);opacity:.5;pointer-events:none;animation:bxFloat 9s ease-in-out infinite alternate}
+html[data-beta="1"] .lock-screen::before{background:#f472b6;top:12%;left:-60px}html[data-beta="1"] .lock-screen::after{background:#22d3ee;bottom:8%;right:-70px;animation-delay:-4s}
+@keyframes bxFloat{to{transform:translate(40px,-50px) scale(1.2)}}
+html[data-beta="1"] .lock-screen .lock-inner{position:relative;z-index:1}
+html[data-beta="1"] .lock-screen .lock-title,html[data-beta="1"] .lock-screen .lock-sub,html[data-beta="1"] .lock-screen .lock-msg,html[data-beta="1"] .lock-screen .link-btn,html[data-beta="1"] .lock-screen .key-btn{color:#fff!important}
+html[data-beta="1"] .lock-screen .lock-badge{background:rgba(255,255,255,.16)!important;border:1px solid rgba(255,255,255,.4);backdrop-filter:blur(16px);color:#fff!important}
+html[data-beta="1"] .lock-screen .key-btn{background:rgba(255,255,255,.14)!important;border:1px solid rgba(255,255,255,.38)!important;backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);box-shadow:inset 0 1px 1px rgba(255,255,255,.6),inset 0 -10px 18px rgba(255,255,255,.05),0 10px 26px rgba(0,0,0,.28)}
+html[data-beta="1"] .lock-screen .key-btn:active{background:rgba(255,255,255,.32)!important;transform:scale(.93)}
+html[data-beta="1"] .lock-screen .pin-dot{border-color:rgba(255,255,255,.75);background:rgba(255,255,255,.12)}
+html[data-beta="1"] .lock-screen .pin-dot.filled{background:#fff;border-color:#fff;box-shadow:0 0 14px rgba(255,255,255,.8)}
+html[data-beta="1"] .lock-screen .lock-inner::after{content:"SECURED BY FIBER NETWORK · BETA";display:block;margin-top:14px;font-size:9px;letter-spacing:.2em;color:rgba(255,255,255,.6);text-align:center}
+
+.bx-bar.ind i{width:40%;animation:bxInd 1.4s ease-in-out infinite alternate}@keyframes bxInd{from{margin-left:0}to{margin-left:60%}}
+.bx-top{display:flex;align-items:center;justify-content:space-between}.bx-sup{width:40px;height:40px;border-radius:12px;border:1px solid var(--line-strong);background:var(--surface-2);color:var(--accent);display:grid;place-items:center}
+.bx-cap{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:10px 0 4px}
+.bx-chat{max-height:140px;overflow:auto;margin-bottom:8px}.bx-m{font-size:13px;line-height:1.45;padding:8px 10px;border-radius:12px;margin-bottom:6px;white-space:pre-wrap}.bx-m.u{background:var(--accent);color:#fff;margin-left:20%}.bx-m.a{background:var(--surface-2)}.bx-m.err{background:var(--accent-soft);color:var(--danger)}
+</style>
+<style>
+/* ===== Nebula theme + Beta polish ===== */
+html[data-theme="nebula"]{--paper:#0a0920;--surface:#14123a;--surface-2:#1a1748;--ink:#f3f1ff;--ink-2:#d2cdf7;--muted:#9d97d2;--line:#2b2866;--line-strong:#443f96;--accent:#8f80ff;--accent-soft:rgba(143,128,255,.18);--danger:#ff7b9c;--shadow:0 6px 18px rgba(3,2,25,.45);--shadow-lg:0 14px 44px rgba(3,2,25,.6);color-scheme:dark}
+html[data-theme="nebula"] .sidebar{background:radial-gradient(90% 45% at 15% 0,rgba(120,100,255,.32),transparent 70%),radial-gradient(80% 40% at 100% 100%,rgba(40,170,255,.2),transparent 70%),var(--paper)}
+html[data-theme="nebula"] .fab{color:#0a0920;box-shadow:0 6px 22px rgba(143,128,255,.45)}
+html:not([data-beta="1"]) .option-btn[data-theme="nebula"]{display:none}
+html[data-beta="1"] .option-btn[data-theme="light"],html[data-beta="1"] .option-btn[data-theme="coal"]{display:none}
+html[data-beta="1"] .loader{background:radial-gradient(90% 60% at 20% 0,rgba(120,100,255,.55),transparent 60%),radial-gradient(80% 60% at 100% 100%,rgba(40,170,255,.38),transparent 60%),#0a0920}
+html[data-beta="1"] .loader-mark{color:#fff;font-weight:600;letter-spacing:-.01em}
+html[data-beta="1"] .loader-rule{background:rgba(255,255,255,.25)}
+html[data-beta="1"] .loader-bar{background:rgba(255,255,255,.18)}
+html[data-beta="1"] .loader-bar span{background:linear-gradient(90deg,#8f80ff,#5ee1ff)}
+.bx-flow{background:linear-gradient(90deg,#8f80ff,#5ee1ff,#ff9be0,#8f80ff);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:bxFlow 6s linear infinite}
+@keyframes bxFlow{to{background-position:300% 0}}
+.bx-fast{display:none;align-items:center;gap:10px;margin:0 0 16px;padding:10px 12px;border:1px solid var(--line-strong);border-radius:12px;background:var(--accent-soft);font-size:12.5px;color:var(--ink-2)}
+html[data-beta="1"] .bx-fast{display:flex}.bx-fast svg{width:18px;height:18px;flex:none;color:var(--accent);fill:currentColor;stroke:none}
+/* Liquid Glass PIN */
+html[data-beta="1"] .lock-screen{background:radial-gradient(90% 55% at 18% 0,rgba(120,100,255,.55),transparent 62%),radial-gradient(80% 55% at 100% 100%,rgba(40,170,255,.36),transparent 62%),#0a0920!important}
+html[data-beta="1"] .lock-screen::before,html[data-beta="1"] .lock-screen::after{opacity:.26;filter:blur(72px)}
+html[data-beta="1"] .lock-screen .lock-inner::after{content:none!important}
+html[data-beta="1"] .lock-screen .lock-badge{width:60px;height:60px;background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.05))!important;border:1px solid rgba(255,255,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+html[data-beta="1"] .lock-screen .lock-title{font-weight:500!important}
+html[data-beta="1"] .lock-screen .key-btn{background:linear-gradient(180deg,rgba(255,255,255,.17),rgba(255,255,255,.05))!important;border:1px solid rgba(255,255,255,.13)!important;font-weight:300;font-size:30px;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(255,255,255,.04),0 10px 26px rgba(4,3,30,.4)}
+html[data-beta="1"] .lock-screen .key-btn:active{background:linear-gradient(180deg,rgba(255,255,255,.32),rgba(255,255,255,.12))!important;transform:scale(.96)}
+html[data-beta="1"] .lock-screen .key-btn.action{background:transparent!important;border-color:transparent!important;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+html[data-beta="1"] .lock-screen .pin-dot{width:13px;height:13px;border:1.5px solid rgba(255,255,255,.55);background:transparent}
+html[data-beta="1"] .lock-screen .pin-dot.filled{background:#fff;border-color:#fff;box-shadow:none;transform:none}
+/* Beta editor screen */
+.bx-edit{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);animation:bxUp .25s ease}
+@keyframes bxUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.bx-edit-bar{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top,0px) + 14px) 18px 12px;border-bottom:1px solid var(--line)}
+.bx-edit-bar b{font-family:var(--font-serif);font-size:17px;font-weight:600}
+.bx-edit-bar button{padding:8px 16px;border-radius:10px;background:var(--accent);color:#fff;font-weight:600}
+html[data-theme="nebula"] .bx-edit-bar button{color:#0a0920}
+.bx-edit-body{flex:1;overflow:auto;padding:18px;max-width:760px;width:100%;margin:0 auto;display:flex;flex-direction:column}
+.bx-edit-body input,.bx-edit-body textarea{width:100%;border:0;background:transparent;color:var(--ink);outline:none;font-family:var(--font-body)}
+.bx-edit-body input{font-size:28px;font-weight:600;padding:0 0 12px;font-family:var(--font-title)}
+.bx-edit-body textarea{flex:1;min-height:50vh;font-size:16.5px;line-height:1.7;resize:none;color:var(--ink-2)}
+.bx-edit-hint{font-size:12px;color:var(--muted);padding:0 0 8px}
+</style>
+</head>
+<body>
+
+<div class="loader" id="loader">
+  <div class="loader-inner">
+    <div class="loader-mark">Ink-Lite</div>
+    <div class="loader-rule"></div>
+    <div class="loader-bar"><span></span></div>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <aside class="sidebar">
+    <header class="sidebar-head">
+      <div class="brand">
+        <span class="brand-mark">Ink-Lite</span>
+        <span class="brand-sub">Notebook</span>
+      </div>
+      <button type="button" class="icon-btn" id="btnSidebarFeedback" title="Feedback & Support" aria-label="Feedback & Support">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </button>
+      <button type="button" class="icon-btn" id="btnSidebarSettings" title="Settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </header>
+
+    <div class="search-wrap">
+      <div class="search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="searchInput" type="search" placeholder="Search notes" autocomplete="off" aria-label="Search notes">
+      </div>
+    </div>
+
+    <nav class="filters" aria-label="Filter notes">
+      <button type="button" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" data-filter="note" aria-pressed="false">Notes</button>
+      <button type="button" data-filter="todo" aria-pressed="false">To-dos</button>
+    </nav>
+
+    <section class="note-list" id="noteList" aria-label="Notes"></section>
+    <footer class="sidebar-foot">
+      Developed by Fiber Network<br>
+      <span style="opacity: 0.7; font-size: 10px;">V1.3</span>
+    </footer>
+
+    <div class="fab-container">
+      <div class="fab-menu" id="fabMenu">
+        <button class="fab-action" data-action="note">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          <span>Note</span>
+        </button>
+        <button class="fab-action" data-action="todo">
+          <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <span>List</span>
+        </button>
+      </div>
+      <button class="fab" id="btnAdd" aria-label="Create new">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main" id="main"></main>
+</div>
+
+<dialog class="modal" id="modalConfirm" aria-labelledby="confirmTitle">
+  <header class="modal-header">
+    <h2 id="confirmTitle">Delete Note</h2>
+    <button type="button" class="icon-btn" data-close aria-label="Close">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </header>
+  <div class="modal-body">
+    <p id="confirmMsg" style="font-size:15px;color:var(--muted);margin-bottom:24px;"></p>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button type="button" class="btn ghost" data-close>Cancel</button>
+      <button type="button" class="btn danger" id="modalConfirmBtn">Delete</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="modal" id="updateModal">
+  <header class="modal-header">
+    <h2>What's New in V1.3</h2>
+    <button type="button" class="icon-btn" onclick="this.closest('dialog').close()" aria-label="Close">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </header>
+  <div class="modal-body">
+    <ul style="padding-left:20px; line-height:1.8; color:var(--ink-2);">
+      <li><strong>Bug fixes</strong> — more stable, more reliable.</li>
+      <li><strong>Improved search</strong> — faster and more accurate results.</li>
+      <li><strong>Cleaner look</strong> — simplified themes and fonts.</li>
+      <li><strong>Photos &amp; biometrics</strong> — photos stay visible in notes; biometric unlock fixed.</li>
+    </ul>
+    <button class="btn primary" style="width:100%; margin-top:24px;" onclick="this.closest('dialog').close()">Got it</button>
+  </div>
+</dialog>
+
+<dialog class="modal" id="settingsModal" aria-labelledby="settingsTitle">
+  <div id="settingsMenuView" class="settings-view active">
+    <header class="modal-header" style="border-bottom:none;padding-bottom:8px;">
+      <h2 id="settingsTitle">Settings</h2>
+      <button type="button" class="icon-btn" data-close-settings aria-label="Close">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </header>
+
+    <div class="modal-body" style="padding:0 0 16px 0;">
+      <div class="settings-menu-item" data-target="appearance">
+        <div class="smi-icon"><svg viewBox="0 0 24 24"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10c0 1.657-1.343 3-3 3h-3.5a2.5 2.5 0 0 0-2.5 2.5v1.5a2.5 2.5 0 0 1-2.5 2.5z"/><circle cx="7.5" cy="10.5" r="1.5" fill="currentColor"/><circle cx="12" cy="7.5" r="1.5" fill="currentColor"/><circle cx="16.5" cy="10.5" r="1.5" fill="currentColor"/></svg></div>
+        <div class="smi-text">Appearance and Interface</div>
+        <div class="smi-chevron">›</div>
+      </div>
+
+      <div class="settings-menu-item" data-target="interaction">
+        <div class="smi-icon"><svg viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></div>
+        <div class="smi-text">Interaction</div>
+        <div class="smi-chevron">›</div>
+      </div>
+
+      <div class="settings-menu-item" data-target="security">
+        <div class="smi-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="smi-text">Security</div>
+        <div class="smi-chevron">›</div>
+      </div>
+
+      <div class="settings-menu-item" data-target="storage">
+        <div class="smi-icon"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
+        <div class="smi-text">Data Usage</div>
+        <div class="smi-chevron">›</div>
+      </div>
+
+      <div class="settings-menu-item" data-target="beta">
+        <div class="smi-icon"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4 20a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1l-6-11V3"/></svg></div>
+        <div class="smi-text">Beta EXP</div>
+        <div class="smi-chevron">›</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="settings-beta" class="settings-view">
+    <div class="subpage-header">
+      <button class="subpage-back" data-back-settings aria-label="Back"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h2 class="subpage-title">Beta EXP</h2>
+    </div>
+    <div class="modal-body" id="betaBody"></div>
+  </div>
+
+  <div id="settings-appearance" class="settings-view">
+    <div class="subpage-header">
+      <button class="subpage-back" data-back-settings aria-label="Back"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h2 class="subpage-title">Appearance</h2>
+    </div>
+    <div class="modal-body">
+      <div class="setting-group">
+        <div class="setting-group-title">Theme</div>
+        <div class="option-grid" style="margin-bottom:24px;">
+          <button type="button" class="option-btn" data-theme="light" aria-pressed="true">Aurora Lite</button>
+          <button type="button" class="option-btn" data-theme="coal" aria-pressed="false">Coal Dark</button>
+          <button type="button" class="option-btn" data-theme="nebula" aria-pressed="false">Nebula</button>
+        </div>
+
+        <div class="setting-group-title">Editor Font</div>
+        <div class="option-grid">
+          <button type="button" class="option-btn" data-font="serif" aria-pressed="true">Serif</button>
+          <button type="button" class="option-btn" data-font="sans" aria-pressed="false">Sans-Serif</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="settings-interaction" class="settings-view">
+    <div class="subpage-header">
+      <button class="subpage-back" data-back-settings aria-label="Back"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h2 class="subpage-title">Interaction</h2>
+    </div>
+    <div class="modal-body">
+      <div class="setting-group">
+        <div class="setting-group-title">Auto-Save</div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Auto-Save Changes</div>
+            <div class="setting-desc">Automatically save edits after 0.5 seconds of inactivity.</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="toggleAutoSave" checked><span class="slider"></span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="settings-security" class="settings-view">
+    <div class="subpage-header">
+      <button class="subpage-back" data-back-settings aria-label="Back"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h2 class="subpage-title">Security</h2>
+    </div>
+    <div class="modal-body">
+      <div class="setting-group">
+        <div class="setting-group-title">Unlock Methods</div>
+
+        <div class="setting-row" style="border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:16px;">
+          <div>
+            <div class="setting-label">PIN Code</div>
+            <div class="setting-desc" id="pinStatusDesc">Not set up</div>
+          </div>
+          <button class="add-method-btn" id="btnSetupPin" title="Add PIN" aria-label="Add PIN"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Biometric Unlock</div>
+            <div class="setting-desc" id="bioStatusDesc">Not set up</div>
+          </div>
+          <button class="add-method-btn" id="btnSetupBio" title="Add Biometrics" aria-label="Add Biometrics"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+      </div>
+
+      <div class="setting-group" style="margin-top:28px;">
+        <div class="setting-group-title">Lock Behavior</div>
+        <div class="setting-row" style="border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:16px;">
+          <div>
+            <div class="setting-label">Lock When I Leave</div>
+            <div class="setting-desc">The app locks as soon as you switch to another app or tab.</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="toggleAutoLock" checked><span class="slider"></span></label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Quick Unlock</div>
+            <div class="setting-desc">A one-tap shortcut, not biometrics. For 2 minutes after you leave, tap the open-lock key instead of typing your PIN.</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="toggleQuick"><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <div id="removeLockWrap" style="margin-top:32px;display:none;">
+        <button class="btn danger" id="btnRemoveLock" style="width:100%;">Turn Off App Lock</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="settings-storage" class="settings-view">
+    <div class="subpage-header">
+      <button class="subpage-back" data-back-settings aria-label="Back"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h2 class="subpage-title">Data Usage</h2>
+    </div>
+    <div class="modal-body">
+      <div class="setting-group">
+        <div class="setting-group-title">Local Data Usage</div>
+        <div class="setting-row" style="border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:16px;">
+          <div>
+            <div class="setting-label">Character Usage</div>
+            <div class="setting-desc" id="charDesc">Loading stats...</div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Notes Storage</div>
+            <div class="setting-desc" id="notesStorageDesc">Loading...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</dialog>
+
+<dialog class="modal" id="setupPinModal" aria-labelledby="setupPinTitle">
+  <header class="modal-header">
+    <h2 id="setupPinTitle">Set PIN Code</h2>
+    <button type="button" class="icon-btn" data-close-setup aria-label="Close"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </header>
+  <div class="modal-body">
+    <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">Create a 4-digit PIN to secure your notes.</p>
+    <input type="password" id="newPinInput" class="setup-pin-input" maxlength="4" placeholder="••••" inputmode="numeric" pattern="[0-9]*" aria-label="New PIN">
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:24px;">
+      <button type="button" class="btn ghost" data-close-setup>Cancel</button>
+      <button type="button" class="btn primary" id="btnSavePin">Save PIN</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="modal" id="removeLockModal" aria-labelledby="removeLockTitle">
+  <header class="modal-header">
+    <h2 id="removeLockTitle">Turn off App Lock</h2>
+    <button type="button" class="icon-btn" data-close-remove aria-label="Close"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </header>
+  <div class="modal-body">
+    <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">Enter your 4-digit PIN to confirm removal.</p>
+    <input type="password" id="verifyPinInput" class="setup-pin-input" maxlength="4" placeholder="••••" inputmode="numeric" pattern="[0-9]*" aria-label="Confirm PIN">
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:24px;">
+      <button type="button" class="btn ghost" data-close-remove>Cancel</button>
+      <button type="button" class="btn danger" id="btnConfirmRemoveLock">Remove Lock</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="modal" id="forgotPinModal" aria-labelledby="forgotPinTitle">
+  <header class="modal-header">
+    <h2 id="forgotPinTitle">Reset App Lock</h2>
+    <button type="button" class="icon-btn" data-close-forgot aria-label="Close"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </header>
+  <div class="modal-body">
+    <p id="forgotMsg" style="font-size:14px;color:var(--muted);margin-bottom:24px;line-height:1.5;"></p>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button type="button" class="btn ghost" data-close-forgot>Cancel</button>
+      <button type="button" class="btn danger" id="btnConfirmResetPin">Reset Lock</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="modal" id="feedbackModal" aria-labelledby="feedbackTitle">
+  <header class="modal-header">
+    <h2 id="feedbackTitle">Feedback &amp; Support</h2>
+    <button type="button" class="icon-btn" data-close-feedback aria-label="Close"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </header>
+  <div class="modal-body">
+    <p style="font-size:12px;color:var(--muted);margin:0 0 16px;">Your feedback is delivered automatically to <strong>super.kennz@yahoo.com</strong>.</p>
+    <div class="bx-fast"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg><span><b>Fast lane.</b> Beta messages are read first and answered quickly.</span></div>
+    <form id="feedbackForm" novalidate>
+      <div class="setting-group-title" style="border-bottom:none;padding-bottom:0;margin-bottom:10px;">Feedback Type</div>
+      <div class="option-grid" style="margin-bottom:20px;">
+        <button type="button" class="option-btn" data-fb-type="bug">Bug Report</button>
+        <button type="button" class="option-btn" data-fb-type="feature">Feature Idea</button>
+        <button type="button" class="option-btn" data-fb-type="general" aria-pressed="true">General</button>
+        <button type="button" class="option-btn" data-fb-type="praise">Praise</button>
+      </div>
+      <div class="setting-label" style="margin-bottom:8px;">Your Message <span style="color:var(--danger);">*</span></div>
+      <textarea id="fbMessage" class="fb-textarea" placeholder="Tell us what's on your mind..." maxlength="2000"></textarea>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--muted);"><span>Be as detailed as possible</span><span id="fbCharCount">0 / 2000</span></div>
+      <div class="setting-label" style="margin-top:16px;margin-bottom:8px;">Your Gmail <span style="color:var(--danger);">*</span></div>
+      <input type="email" id="fbEmail" class="fb-input" placeholder="yourname@gmail.com" required maxlength="120" autocomplete="email">
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:24px;">
+        <button type="button" class="btn ghost" data-close-feedback>Cancel</button>
+        <button type="submit" class="btn primary" id="fbSubmit">Submit Feedback</button>
+      </div>
+    </form>
+    <div id="feedbackSuccess" hidden>
+      <div style="text-align:center;padding:12px 0;">
+        <div id="fbIcon" style="margin-bottom:12px;color:#10b981;"><svg viewBox="0 0 24 24" style="width:48px;height:48px;stroke-width:2;"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div id="fbTitle" style="font-family:var(--font-serif);font-size:20px;font-weight:700;margin-bottom:6px;">Thank you!</div>
+        <div id="fbDelivered" style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.4;">Sending…</div>
+        <div style="background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:20px;">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;margin-bottom:6px;">Reference Number</div>
+          <div id="fbRef" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:18px;font-weight:700;color:var(--accent);"></div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <button type="button" class="btn ghost" id="fbReopenMail">Send via Mail App</button>
+          <button type="button" class="btn ghost" id="fbCopyRef">Copy Reference</button>
+          <button type="button" class="btn primary" data-close-feedback>Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<div class="lock-screen" id="lockScreen" hidden role="dialog" aria-modal="true" aria-label="Unlock Ink-Lite">
+  <div class="lock-inner">
+    <div class="lock-badge"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+    <div class="lock-title">Ink-Lite</div>
+    <div class="lock-sub">Enter your PIN to unlock</div>
+    <div class="pin-dots" id="pinDots"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
+    <div class="lock-msg" id="lockMsg" aria-live="polite"></div>
+    <div class="keypad" id="keypad">
+      <button type="button" class="key-btn" data-num="1">1</button>
+      <button type="button" class="key-btn" data-num="2">2</button>
+      <button type="button" class="key-btn" data-num="3">3</button>
+      <button type="button" class="key-btn" data-num="4">4</button>
+      <button type="button" class="key-btn" data-num="5">5</button>
+      <button type="button" class="key-btn" data-num="6">6</button>
+      <button type="button" class="key-btn" data-num="7">7</button>
+      <button type="button" class="key-btn" data-num="8">8</button>
+      <button type="button" class="key-btn" data-num="9">9</button>
+      <button type="button" class="key-btn action" data-action="bio" title="Unlock with biometrics" aria-label="Unlock with biometrics" style="color:var(--accent);"><svg viewBox="0 0 24 24"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg></button>
+      <button type="button" class="key-btn" data-num="0">0</button>
+      <button type="button" class="key-btn action" data-action="del" aria-label="Delete"><svg viewBox="0 0 24 24"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg></button>
+    </div>
+    <button type="button" id="btnForgotPin" class="link-btn">Forgot PIN?</button>
+  </div>
+</div>
+
+<script type="module">
+(() => {
+  'use strict';
+
+  /* Keep the layout exactly as tall as the visible area (so no blank strip appears when the keyboard opens)
+     and remove any stray text that a viewer app or markup error may leave above the app. */
+  (function fitViewport() {
+    const vv = window.visualViewport;
+    const root = document.documentElement;
+    let baseH = window.innerHeight;
+    const fit = () => {
+      const ih = Math.round(window.innerHeight);
+      const editing = /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || '');
+      if (!editing || ih > baseH) baseH = ih;
+      // Only when the page was NOT resized by the keyboard (overlay mode) reserve space for it.
+      let kb = 0;
+      if (vv && editing && ih >= baseH - 4) kb = Math.max(0, Math.round(baseH - vv.height - vv.offsetTop));
+      root.style.setProperty('--kb', (kb > 80 ? kb : 0) + 'px');
+      if (window.scrollX || window.scrollY) window.scrollTo(0, 0);
+    };
+    const refit = () => { fit(); [80, 250, 500].forEach(t => setTimeout(fit, t)); };
+    document.addEventListener('focusin', refit);
+    document.addEventListener('focusout', refit);
+    fit();
+    if (vv) { vv.addEventListener('resize', fit); vv.addEventListener('scroll', fit); }
+    window.addEventListener('resize', fit);
+    window.addEventListener('orientationchange', () => setTimeout(fit, 200));
+    const sweep = (node) => Array.from(node.childNodes).forEach(n => { if (n.nodeType === 3 && n.textContent.trim()) n.remove(); });
+    sweep(document.body); sweep(document.documentElement);
+
+    // Keep the + button exactly 12px above the footer, whatever the footer's height is.
+    const foot = document.querySelector('.sidebar-foot');
+    const side = document.querySelector('.sidebar');
+    const fitFoot = () => { if (foot && side) side.style.setProperty('--foot-h', foot.offsetHeight + 'px'); };
+    fitFoot();
+    if (foot && window.ResizeObserver) new ResizeObserver(fitFoot).observe(foot);
+    window.addEventListener('resize', fitFoot);
+  })();
+
+  const STORE_KEY = 'ink-lite.store.v3';
+  const PREF_KEY = 'ink-lite.prefs.v3';
+  const FEEDBACK_KEY = 'ink-lite.feedback.v1';
+  const AI_KEY = 'ink-lite.ai.v1';
+  const UPDATE_KEY = 'ink-lite.seen_update_v1.3';
+
+  const FEEDBACK_EMAIL = 'super.kennz@yahoo.com';
+  const FORMSUBMIT_ENDPOINT = `https://formsubmit.co/ajax/${FEEDBACK_EMAIL}`;
+  // Optional: free access key from web3forms.com (enter your e-mail there, the key is mailed instantly).
+  // When set, feedback is sent through it first and needs no activation click.
+  const WEB3FORMS_KEY = '';
+
+  const ICONS = {
+    pin: '<svg viewBox="0 0 24 24"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>',
+    trash: '<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>',
+    check: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
+    close: '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    back: '<svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>',
+    lock: '<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+    unlock: '<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>',
+    manualSave: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
+  };
+
+  const state = {
+    notes: [],
+    activeId: null,
+    filter: 'all',
+    query: '',
+    prefs: {
+      theme: 'light', font: 'serif', autoSave: true,
+      biometric: false, pin: null, credentialId: null, bioPublicKey: null,
+      pinHash: null, pinSalt: null,
+      quickUnlock: false, autoLock: true,
+      failCount: 0, lockUntil: 0
+    }
+  };
+
+  const ai = { model: '', device: 'auto', history: [] };
+
+  let saveTimer = null;
+  let currentPinEntry = '';
+
+  const appEl = document.getElementById('app');
+  const mainEl = document.getElementById('main');
+  const listEl = document.getElementById('noteList');
+  const searchEl = document.getElementById('searchInput');
+  const btnAddEl = document.getElementById('btnAdd');
+  const fabMenu = document.getElementById('fabMenu');
+  const settingsModal = document.getElementById('settingsModal');
+  const HAS_SUBTLE = !!(globalThis.crypto?.subtle);
+
+  /* ---------- Helpers ---------- */
+  const uid = () => globalThis.crypto?.randomUUID?.() ?? (Date.now().toString(36) + Math.random().toString(36).slice(2, 8));
+  const esc = (str) => String(str ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const DATE_FMT = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
+  const DATE_FMT_YEAR = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  const shortDate = (ts) => {
+    const d = new Date(ts);
+    return (d.getFullYear() === new Date().getFullYear() ? DATE_FMT : DATE_FMT_YEAR).format(d);
+  };
+  const getActive = () => state.notes.find((n) => n.id === state.activeId) ?? null;
+
+  const b64 = {
+    enc(buf) {
+      const bytes = new Uint8Array(buf);
+      let s = '';
+      for (const byte of bytes) s += String.fromCharCode(byte);
+      return btoa(s).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
+    },
+    dec(str) {
+      const s = atob(str.replaceAll('-', '+').replaceAll('_', '/'));
+      const bytes = new Uint8Array(s.length);
+      for (let i = 0; i < s.length; i++) bytes[i] = s.charCodeAt(i);
+      return bytes;
+    }
+  };
+
+  /* ---------- PIN validation (FIX: robust hasPin) ---------- */
+  function hasPin() {
+    if (state.prefs.pinHash && state.prefs.pinSalt && HAS_SUBTLE) return true;
+    if (state.prefs.pin && /^\d{4}$/.test(String(state.prefs.pin))) return true;
+    return false;
+  }
+
+  function hasValidBiometric() {
+    return !!(state.prefs.biometric && state.prefs.credentialId);
+  }
+
+  /* ---------- Biometric ---------- */
+  function bioSupport() {
+    const { protocol, hostname } = location;
+    const okOrigin = protocol === 'https:' || (protocol === 'http:' && (hostname === 'localhost' || hostname === '127.0.0.1'));
+    if (protocol === 'file:') return { ok: false, reason: 'Biometrics do not work from a saved file. Open Ink-Lite from its https link.' };
+    if (!okOrigin) return { ok: false, reason: 'Biometrics need an https link.' };
+    try {
+      const pp = document.permissionsPolicy ?? document.featurePolicy;
+      if (window.top !== window.self && pp && typeof pp.allowsFeature === 'function') {
+        const all = typeof pp.features === 'function' ? pp.features() : null;
+        const need = ['publickey-credentials-get', 'publickey-credentials-create'].filter(f => !all || all.includes(f));
+        if (need.some(f => !pp.allowsFeature(f))) return { ok: false, reason: 'Biometrics blocked in this preview.' };
+      }
+    } catch {}
+    if (!window.isSecureContext || !globalThis.PublicKeyCredential || !navigator.credentials) return { ok: false, reason: 'Biometric not supported.' };
+    return { ok: true, reason: '' };
+  }
+
+  async function bioHardwareAvailable() {
+    try { return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); }
+    catch { return false; }
+  }
+
+  function derToRaw(der) {
+    if (der[0] !== 0x30) throw new Error('Bad signature');
+    let o = 2;
+    const readInt = () => {
+      if (der[o] !== 0x02) throw new Error('Bad signature');
+      const len = der[o + 1]; o += 2;
+      let int = der.slice(o, o + len); o += len;
+      while (int.length > 32 && int[0] === 0) int = int.slice(1);
+      const out = new Uint8Array(32); out.set(int, 32 - int.length); return out;
+    };
+    const r = readInt(); const s = readInt();
+    const raw = new Uint8Array(64); raw.set(r, 0); raw.set(s, 32); return raw;
+  }
+
+  async function enrollBiometric() {
+    const support = bioSupport();
+    if (!support.ok) return { ok: false, msg: support.reason };
+    if (!(await bioHardwareAvailable())) return { ok: false, msg: 'Set up a fingerprint or face unlock in your phone settings first.' };
+    try {
+      const cred = await navigator.credentials.create({
+        publicKey: {
+          challenge: crypto.getRandomValues(new Uint8Array(32)),
+          rp: { name: 'Ink-Lite' },
+          user: { id: crypto.getRandomValues(new Uint8Array(16)), name: 'ink-lite', displayName: 'Ink-Lite User' },
+          pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+          authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required' },
+          timeout: 60_000, attestation: 'none'
+        }
+      });
+      const pk = cred?.response?.getPublicKey?.() ?? null;
+      if (!cred?.rawId) return { ok: false, msg: 'Registration failed.' };
+      state.prefs.credentialId = b64.enc(cred.rawId);
+      state.prefs.bioPublicKey = pk ? b64.enc(pk) : '';
+      state.prefs.biometric = true;
+      persist();
+      return { ok: true };
+    } catch (err) {
+      if (err?.name === 'NotAllowedError') return { ok: false, msg: 'Cancelled.' };
+      return { ok: false, msg: 'Setup failed.' };
+    }
+  }
+
+  async function verifyBiometric() {
+    const support = bioSupport();
+    if (!support.ok) return { ok: false, msg: support.reason };
+    if (!state.prefs.credentialId) return { ok: false, msg: 'Biometric not set up.' };
+    try {
+      const challenge = crypto.getRandomValues(new Uint8Array(32));
+      const assertion = await navigator.credentials.get({
+        publicKey: {
+          challenge,
+          allowCredentials: [{ type: 'public-key', id: b64.dec(state.prefs.credentialId) }],
+          userVerification: 'required', timeout: 60_000
+        }
+      });
+      if (!assertion) return { ok: false, msg: 'Biometric failed.' };
+      const r = assertion.response;
+      const clientData = JSON.parse(new TextDecoder().decode(r.clientDataJSON));
+      if (clientData.type !== 'webauthn.get' || clientData.challenge !== b64.enc(challenge)) return { ok: false, msg: 'Biometric failed.' };
+      const authData = new Uint8Array(r.authenticatorData);
+      if (!(authData[32] & 0x04)) return { ok: false, msg: 'Biometric failed.' };
+      if (!state.prefs.bioPublicKey) return { ok: true };
+      const clientHash = new Uint8Array(await crypto.subtle.digest('SHA-256', r.clientDataJSON));
+      const signed = new Uint8Array(authData.length + clientHash.length);
+      signed.set(authData, 0); signed.set(clientHash, authData.length);
+      const key = await crypto.subtle.importKey('spki', b64.dec(state.prefs.bioPublicKey), { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
+      const valid = await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, derToRaw(new Uint8Array(r.signature)), signed);
+      return valid ? { ok: true } : { ok: false, msg: 'Biometric failed.' };
+    } catch (err) {
+      if (err?.name === 'NotAllowedError') return { ok: false, msg: 'Cancelled.' };
+      return { ok: false, msg: 'Biometric failed.' };
+    }
+  }
+
+  function updateBioStatus() {
+    const pinEl = document.getElementById('pinStatusDesc');
+    const bioEl = document.getElementById('bioStatusDesc');
+    const removeWrap = document.getElementById('removeLockWrap');
+    const pinOn = hasPin();
+
+    if (pinEl) { pinEl.textContent = pinOn ? 'PIN is active' : 'Not set up'; pinEl.style.color = pinOn ? 'var(--accent)' : 'var(--muted)'; }
+    if (bioEl) { bioEl.textContent = hasValidBiometric() ? 'Active' : (bioSupport().ok ? 'Not set up' : bioSupport().reason); bioEl.style.color = hasValidBiometric() ? 'var(--accent)' : 'var(--muted)'; }
+    if (removeWrap) removeWrap.style.display = (pinOn || hasValidBiometric()) ? 'block' : 'none';
+
+    const tAuto = document.getElementById('toggleAutoLock');
+    const tQuick = document.getElementById('toggleQuick');
+    if (tAuto) { tAuto.checked = !!state.prefs.autoLock; tAuto.disabled = !pinOn; }
+    if (tQuick) { tQuick.checked = !!(state.prefs.quickUnlock && state.prefs.autoLock && pinOn); tQuick.disabled = !(pinOn && state.prefs.autoLock); }
+  }
+
+  /* ---------- Internal modules (no UI, not exposed outside this scope) ---------- */
+
+  /* Security-Fiber: PIN hardening (slower hash for new PINs, safe lock values, one check at a time). */
+  const SecurityFiber = Object.freeze((() => {
+    const ITER_NEW = 100_000, ITER_OLD = 10_000, MAX_LOCK_MS = 15 * 60 * 1000;
+    const num = (v, d, lo, hi) => { v = Number(v); return Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
+    let checking = false;
+    return {
+      ITER_NEW, ITER_OLD,
+      sanitize(p) {
+        p.failCount = Math.round(num(p.failCount, 0, 0, 1000));
+        p.lockUntil = num(p.lockUntil, 0, 0, Date.now() + MAX_LOCK_MS);
+        p.pinIter = p.pinIter === ITER_NEW ? ITER_NEW : ITER_OLD;
+      },
+      iterFor(p) { return p.pinIter === ITER_NEW ? ITER_NEW : ITER_OLD; },
+      enter() { if (checking) return false; checking = true; return true; },
+      leave() { checking = false; }
+    };
+  })());
+
+  /* Beta Security: validates notes on load, keeps a rolling backup, restores a corrupt store, never loses data silently. */
+  const BetaSecurity = Object.freeze((() => {
+    const BAK = STORE_KEY + '.bak', BAD = STORE_KEY + '.corrupt';
+    let lastBak = 0;
+    const str = (v, max) => (typeof v === 'string' ? v.slice(0, max) : '');
+    const cleanNote = (n, seen) => {
+      if (!n || typeof n !== 'object' || Array.isArray(n)) return null;
+      const o = Object.assign({}, n);
+      o.id = (typeof o.id === 'string' && o.id && !seen.has(o.id)) ? o.id.slice(0, 80) : uid();
+      seen.add(o.id);
+      o.type = o.type === 'todo' ? 'todo' : 'note';
+      o.title = str(o.title, 2000);
+      o.body = str(o.body, 500000);
+      o.pinned = !!o.pinned; o.locked = !!o.locked;
+      o.updatedAt = Number.isFinite(Number(o.updatedAt)) ? Number(o.updatedAt) : Date.now();
+      o.items = Array.isArray(o.items) ? o.items.filter(i => i && typeof i === 'object').map(i => Object.assign({}, i, { id: (typeof i.id === 'string' && i.id) ? i.id : uid(), text: str(i.text, 5000), done: !!i.done })) : [];
+      o.images = Array.isArray(o.images) ? o.images.filter(x => typeof x === 'string' && x.startsWith('data:image/')) : [];
+      return o;
+    };
+    return {
+      read() {
+        for (const k of [STORE_KEY, BAK]) {
+          let raw = null;
+          try { raw = localStorage.getItem(k); } catch {}
+          if (!raw) continue;
+          try {
+            const d = JSON.parse(raw);
+            if (Array.isArray(d && d.notes)) {
+              if (k === BAK) { try { localStorage.setItem(STORE_KEY, raw); } catch {} }
+              return d;
+            }
+          } catch {}
+          if (k === STORE_KEY) { try { localStorage.setItem(BAD, raw); } catch {} }
+        }
+        return null;
+      },
+      hasRaw() { try { return localStorage.getItem(STORE_KEY) !== null || localStorage.getItem(BAK) !== null; } catch { return false; } },
+      clean(d) {
+        const seen = new Set();
+        const notes = d.notes.map(n => cleanNote(n, seen)).filter(Boolean);
+        const activeId = notes.some(n => n.id === d.activeId) ? d.activeId : (notes[0] ? notes[0].id : null);
+        return { notes, activeId };
+      },
+      beforeWrite() {
+        const now = Date.now();
+        if (now - lastBak < 20000) return;
+        try { const prev = localStorage.getItem(STORE_KEY); if (prev) { localStorage.setItem(BAK, prev); lastBak = now; } } catch {}
+      },
+      set(key, val) {
+        try { localStorage.setItem(key, val); return true; }
+        catch { try { localStorage.removeItem(BAK); localStorage.removeItem(BAD); localStorage.setItem(key, val); return true; } catch { return false; } }
+      }
+    };
+  })());
+
+  /* AI Handler: crash guard, safe mode, input/output safety and a real-model fallback chain (never simulated). */
+  const AIHandler = Object.freeze((() => {
+    const KEY = 'ink-lite.ai.guard.v1';
+    const ORDER = ['onnx-community/Qwen2.5-0.5B-Instruct', 'onnx-community/SmolLM2-360M-Instruct', 'onnx-community/SmolLM2-135M-Instruct'];
+    const get = () => { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch { return {}; } };
+    const put = (g) => { try { localStorage.setItem(KEY, JSON.stringify(g)); } catch {} };
+    const clean = (t, max) => String(t == null ? '' : t).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '').slice(0, max);
+    const lighter = (id) => { const i = ORDER.indexOf(id); return i >= 0 && i < ORDER.length - 1 ? ORDER[i + 1] : id; };
+    return {
+      boot() { const g = get(); if (g.loading) { g.crashes = (g.crashes || 0) + 1; g.at = Date.now(); g.safe = true; g.crashed = g.loadingModel || ''; g.loading = 0; put(g); } },
+      safe() { return !!get().safe; },
+      blocked() { const g = get(); return (g.crashes || 0) >= 3 && Date.now() - (g.at || 0) < 120000; },
+      begin(model) { const g = get(); g.loading = Date.now(); g.loadingModel = model || ''; put(g); },
+      idle() { const g = get(); if (g.loading) { g.loading = 0; put(g); } },
+      ok() { const g = get(); g.loading = 0; g.crashes = 0; put(g); },
+      reset() { put({}); },
+      model(pref) { const g = get(); return (g.crashed && g.crashed === pref) ? lighter(pref) : pref; },
+      chain(id) { const i = ORDER.indexOf(id); return i < 0 ? [id] : ORDER.slice(i); },
+      device(pref) { return (pref === 'cpu' || this.safe() || pref !== 'gpu') ? 'cpu' : 'gpu'; },
+      messages(list) {
+        return (Array.isArray(list) ? list : []).slice(-6)
+          .filter(m => m && (m.role === 'user' || m.role === 'assistant'))
+          .map(m => ({ role: m.role, content: clean(m.content, 2000) }));
+      },
+      out(t) { return clean(t, 6000); }
+    };
+  })());
+
+  /* ---------- Load & Persist ---------- */
+  function load() {
+    try {
+      const rawPrefs = localStorage.getItem(PREF_KEY);
+      if (rawPrefs) Object.assign(state.prefs, JSON.parse(rawPrefs));
+      SecurityFiber.sanitize(state.prefs);
+      // Removed options: fall back if an old saved preference points to them
+      if (!['light', 'coal', 'nebula'].includes(state.prefs.theme)) state.prefs.theme = 'light';
+      if (!['serif', 'sans'].includes(state.prefs.font)) state.prefs.font = 'serif';
+
+      // FIX: Clean up any invalid/corrupt PIN state
+      if (state.prefs.pinHash && (!state.prefs.pinSalt || !HAS_SUBTLE)) {
+        state.prefs.pinHash = null;
+        state.prefs.pinSalt = null;
+      }
+      if (state.prefs.pin && !/^\d{4}$/.test(String(state.prefs.pin))) {
+        state.prefs.pin = null;
+      }
+      if (!state.prefs.credentialId) {
+        state.prefs.biometric = false;
+      }
+      if (!hasPin()) {
+        state.prefs.biometric = false;
+        state.prefs.credentialId = null;
+        state.prefs.bioPublicKey = null;
+        state.prefs.quickUnlock = false;
+      }
+
+      applyPrefs();
+
+      const stored = BetaSecurity.read();
+      if (stored) {
+        const data = BetaSecurity.clean(stored);
+        state.notes = data.notes;
+        state.activeId = data.activeId;
+      } else if (BetaSecurity.hasRaw()) {
+        // Unreadable data was kept aside (never overwritten silently); start with an empty notebook.
+        state.notes = []; state.activeId = null;
+      } else {
+        state.notes = [{
+          id: 'welcome', type: 'note', title: 'Welcome to Ink-Lite',
+          body: "Welcome to your new professional notebook!\n\nHere is what you can do:\n- Create Notes & Lists using the + button.\n- Customize themes and fonts in Settings.\n- Long-press notes in the sidebar to Pin or Lock.\n- Tap the message icon to send feedback to the team.\n\n(Click anywhere in this note to reopen the tutorial.)",
+          isWelcome: true, updatedAt: Date.now(), pinned: true, images: []
+        }];
+        state.activeId = 'welcome';
+        persist();
+      }
+    } catch (e) { console.warn(e); }
+    updateCharCount();
+  }
+
+  function persist() {
+    try {
+      BetaSecurity.beforeWrite();
+      BetaSecurity.set(STORE_KEY, JSON.stringify({ notes: state.notes, activeId: state.activeId }));
+      BetaSecurity.set(PREF_KEY, JSON.stringify(state.prefs));
+    } catch (e) { console.warn(e); }
+  }
+
+  function applyPrefs() {
+    document.documentElement.dataset.theme = state.prefs.theme;
+    document.documentElement.dataset.font = state.prefs.font;
+    document.querySelectorAll('.option-btn[data-theme]').forEach(btn => btn.setAttribute('aria-pressed', String(btn.dataset.theme === state.prefs.theme)));
+    document.querySelectorAll('.option-btn[data-font]').forEach(btn => btn.setAttribute('aria-pressed', String(btn.dataset.font === state.prefs.font)));
+    const tgAuto = document.getElementById('toggleAutoSave');
+    if (tgAuto) tgAuto.checked = state.prefs.autoSave;
+    updateBioStatus();
+    updateCharCount();
+  }
+
+  function updateCharCount() {
+    let total = 0;
+    for (const n of state.notes) {
+      total += (n.title?.length ?? 0) + (n.body?.length ?? 0);
+      if (Array.isArray(n.items)) for (const i of n.items) total += (i.text?.length ?? 0);
+    }
+    const el = document.getElementById('charDesc');
+    if (el) el.textContent = `${total.toLocaleString()} / ${(25_350).toLocaleString()} chars used`;
+    const notesEl = document.getElementById('notesStorageDesc');
+    if (notesEl) notesEl.textContent = `${state.notes.length} / 35 notes used`;
+  }
+
+  function renderList() {
+    const q = state.query.toLowerCase();
+    const filtered = state.notes.filter(n => {
+      const matchType = state.filter === 'all' || n.type === state.filter;
+      const text = `${n.title ?? ''}${n.body ?? ''}${n.items?.map(i => i.text).join(' ') ?? ''}`;
+      return matchType && text.toLowerCase().includes(q);
+    }).sort((a, b) => (b.pinned - a.pinned) || (b.updatedAt - a.updatedAt));
+
+    if (!filtered.length) {
+      listEl.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 20px;">No notes found.</div>`;
+      return;
+    }
+    listEl.innerHTML = filtered.map(n => {
+      const title = (n.title ?? '').trim() || 'Untitled';
+      let prev = '', tag = '';
+      if (n.type === 'todo') {
+        const items = (n.items ?? []).filter(i => (i.text ?? '').trim());
+        prev = items.map(i => i.text.trim()).join(', ') || 'Empty list';
+        tag = `List · ${(n.items ?? []).filter(i => i.done).length}/${(n.items ?? []).length}`;
+      } else {
+        prev = (n.body ?? '').replace(/\s+/g, ' ').trim() || 'Empty note';
+        tag = 'Note';
+      }
+      return `<button type="button" class="note-item" data-id="${n.id}" aria-current="${n.id === state.activeId}">
+        <div class="note-item-top">
+          <span class="note-title">${esc(title)}</span>
+          <span class="note-icons">
+            ${n.pinned ? '<div class="indicator-dot"></div>' : ''}
+            ${n.locked ? `<div class="indicator-lock">${ICONS.lock}</div>` : ''}
+          </span>
+        </div>
+        <div class="note-preview">${esc(prev.substring(0, 140))}</div>
+        <div class="note-meta"><span>${tag}</span><div class="meta-dot"></div><span>${shortDate(n.updatedAt)}</span></div>
+      </button>`;
+    }).join('');
+  }
+
+  /* ---------- Editor ---------- */
+  function renderEditor(preserveScroll = false) {
+    const note = getActive();
+    const prevScrollEl = document.getElementById('editorScroll');
+    const prevScrollTop = preserveScroll && prevScrollEl ? prevScrollEl.scrollTop : 0;
+
+    if (!note) {
+      appEl.classList.remove('viewing');
+      mainEl.innerHTML = `<div class="empty"><div class="empty-mark">Ink-Lite</div><p>Select a note or create a new one.</p></div>`;
+      return;
+    }
+    appEl.classList.add('viewing');
+
+    const showManualSave = !state.prefs.autoSave;
+    const lockedClass = note.locked ? ' is-locked' : '';
+
+    mainEl.innerHTML = `
+      <div class="editor${lockedClass}">
+        <div class="editor-bar">
+          <button class="icon-btn" id="btnBack" style="display:grid;" title="All notes" aria-label="All notes">${ICONS.back}</button>
+          <span class="type-chip">${note.type === 'todo' ? 'List' : 'Note'}</span>
+          <span class="save-status" id="saveStatus" aria-live="polite">Saved</span>
+          <div class="bar-spacer"></div>
+          <button class="icon-btn" id="btnManualSave" title="Save" aria-label="Save" style="${showManualSave ? 'display:grid' : ''}">${ICONS.manualSave}</button>
+          ${note.locked
+            ? `<button class="icon-btn" id="btnLock" title="Unlock">${ICONS.unlock}</button>`
+            : `<button class="icon-btn ${note.pinned ? 'is-on' : ''}" id="btnPin" title="Pin Note">${ICONS.pin}</button>`}
+          <button class="icon-btn danger" id="btnDelete" title="Delete">${ICONS.trash}</button>
+        </div>
+        <div class="editor-scroll" id="editorScroll">
+          <div class="sheet">
+            ${note.locked ? '<div class="unlock-banner"><span>Note is locked.</span><button class="btn primary" id="btnUnlock">Unlock</button></div>' : ''}
+            <input type="text" class="title-input" id="titleInput" placeholder="Title" value="${esc(note.title)}" ${note.locked ? 'readonly' : ''}>
+            <div class="editor-body" id="editorBody"></div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const bodyEl = document.getElementById('editorBody');
+    const scrollWrap = document.getElementById('editorScroll');
+
+    if (note.type === 'note') {
+      const ta = document.createElement('textarea');
+      ta.className = 'body-input';
+      ta.placeholder = 'Start writing...';
+      ta.value = note.body ?? '';
+      ta.maxLength = 25_350;
+      ta.readOnly = !!note.locked;
+      const doAutoGrow = () => {
+        const keepTop = scrollWrap?.scrollTop ?? 0;
+        ta.style.height = '1px';
+        ta.style.height = `${ta.scrollHeight}px`;
+        if (scrollWrap) { void scrollWrap.offsetHeight; scrollWrap.scrollTop = keepTop; }
+      };
+      if (!note.locked) ta.addEventListener('input', () => { note.body = ta.value; doAutoGrow(); touch(); });
+      bodyEl.appendChild(ta);
+      doAutoGrow();
+
+      const imagesWrap = document.createElement('div');
+      imagesWrap.style.marginTop = '20px';
+      imagesWrap.style.display = 'flex';
+      imagesWrap.style.flexDirection = 'column';
+      imagesWrap.style.gap = '10px';
+      if (note.images) {
+        note.images.forEach((imgSrc, idx) => {
+          const wrapper = document.createElement('div');
+          wrapper.style.position = 'relative';
+          wrapper.style.display = 'inline-block';
+          const imgEl = document.createElement('img');
+          imgEl.src = imgSrc;
+          imgEl.style.cssText = 'display:block;max-width:100%;min-height:48px;height:auto;'; imgEl.alt = 'Photo';
+          imgEl.style.borderRadius = '8px';
+          wrapper.appendChild(imgEl);
+          if (!note.locked) {
+            const delBtn = document.createElement('button');
+            delBtn.innerHTML = ICONS.close;
+            delBtn.style.cssText = 'position:absolute;top:5px;right:5px;background:rgba(0,0,0,0.5);color:#fff;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;';
+            delBtn.onclick = () => { note.images.splice(idx, 1); touch(); renderEditor(true); };
+            wrapper.appendChild(delBtn);
+          }
+          imagesWrap.appendChild(wrapper);
+        });
+      }
+      bodyEl.appendChild(imagesWrap);
+    } else {
+      const list = document.createElement('div');
+      list.className = 'todo-list';
+      for (const [idx, item] of (note.items ?? []).entries()) {
+        const row = document.createElement('div');
+        row.className = `todo-row ${item.done ? 'is-done' : ''}`;
+        row.innerHTML = `
+          <button class="check" ${note.locked ? 'disabled' : ''}>${ICONS.check}</button>
+          <input type="text" class="todo-text" value="${esc(item.text)}" placeholder="Item" ${note.locked ? 'readonly' : ''}>
+          ${!note.locked ? `<button class="icon-btn danger" style="width:28px;height:28px;">${ICONS.close}</button>` : ''}
+        `;
+        if (!note.locked) {
+          const checkBtn = row.querySelector('.check');
+          const input = row.querySelector('.todo-text');
+          const rmBtn = row.querySelector('.icon-btn.danger');
+          checkBtn.onclick = () => { item.done = !item.done; row.classList.toggle('is-done'); touch(); renderList(); };
+          input.oninput = () => { item.text = input.value; touch(); renderList(); };
+          input.onkeydown = (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); note.items.splice(idx + 1, 0, { id: uid(), text: '', done: false }); renderEditor(true); requestAnimationFrame(() => { document.querySelectorAll('.todo-text')[idx + 1]?.focus(); }); }
+            if (e.key === 'Backspace' && input.value === '') { e.preventDefault(); note.items.splice(idx, 1); renderEditor(true); requestAnimationFrame(() => { document.querySelectorAll('.todo-text')[Math.max(0, idx - 1)]?.focus(); }); }
+          };
+          rmBtn.onclick = () => { note.items.splice(idx, 1); renderEditor(true); touch(); };
+        }
+        list.appendChild(row);
+      }
+      if (!note.locked) {
+        const addRow = document.createElement('div');
+        addRow.className = 'todo-add';
+        addRow.innerHTML = `<div style="width:20px;text-align:center;font-size:20px;">+</div><input type="text" class="todo-add-input" placeholder="Add item...">`;
+        const addInp = addRow.querySelector('input');
+        addInp.onkeydown = (e) => {
+          if (e.key === 'Enter' && addInp.value.trim()) {
+            note.items ??= [];
+            note.items.push({ id: uid(), text: addInp.value.trim(), done: false });
+            renderEditor(true); touch();
+            requestAnimationFrame(() => { const arr = document.querySelectorAll('.todo-text'); arr[arr.length - 1]?.focus(); });
+          }
+        };
+        list.appendChild(addRow);
+      }
+      bodyEl.appendChild(list);
+    }
+
+    document.getElementById('btnBack').onclick = () => appEl.classList.remove('viewing');
+    document.getElementById('btnDelete').onclick = () => requestDelete(note);
+
+    if (!note.locked) {
+      document.getElementById('btnPin').onclick = () => { note.pinned = !note.pinned; touch(); renderEditor(true); renderList(); };
+      document.getElementById('titleInput').oninput = (e) => { note.title = e.target.value; touch(); renderList(); };
+      const mSave = document.getElementById('btnManualSave');
+      if (mSave) mSave.onclick = () => { persist(); const st = document.getElementById('saveStatus'); if (st) { st.textContent = 'Saved'; st.style.color = '#10b981'; setTimeout(() => st.style.color = 'var(--muted)', 2000); } };
+    } else {
+      document.getElementById('btnLock').onclick = () => { note.locked = false; touch(); renderEditor(true); };
+      const uBtn = document.getElementById('btnUnlock');
+      if (uBtn) uBtn.onclick = () => { note.locked = false; touch(); renderEditor(true); };
+    }
+
+    const scrollEl = document.getElementById('editorScroll');
+    if (scrollEl) { void scrollEl.offsetHeight; if (prevScrollTop) scrollEl.scrollTop = prevScrollTop; }
+  }
+
+  function touch() {
+    const note = getActive();
+    if (!note) return;
+    note.updatedAt = Date.now();
+    const st = document.getElementById('saveStatus');
+    if (st) st.textContent = state.prefs.autoSave ? 'Saving...' : 'Unsaved';
+    if (state.prefs.autoSave) {
+      if (saveTimer) clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => { persist(); if (st) st.textContent = 'Saved'; updateCharCount(); }, 500);
+    }
+  }
+
+  async function requestDelete(note) {
+    if (!note) return;
+    const title = note.title?.trim() || 'Untitled';
+    const modal = document.getElementById('modalConfirm');
+    const msgEl = document.getElementById('confirmMsg');
+    const confirmBtn = document.getElementById('modalConfirmBtn');
+    msgEl.textContent = `Are you sure you want to delete "${title}"?`;
+    modal.returnValue = '';
+    modal.showModal();
+    const confirmed = await new Promise((resolve) => {
+      const onClose = () => {
+        modal.removeEventListener('close', onClose);
+        modal.onclick = null; confirmBtn.onclick = null;
+        modal.querySelectorAll('[data-close]').forEach(el => { el.onclick = null; });
+        resolve(modal.returnValue === 'confirm');
+      };
+      modal.addEventListener('close', onClose);
+      modal.onclick = (e) => { if (e.target === modal) modal.close(); };
+      confirmBtn.onclick = () => modal.close('confirm');
+      modal.querySelectorAll('[data-close]').forEach(el => { el.onclick = () => modal.close(); });
+    });
+    if (confirmed) {
+      state.notes = state.notes.filter(n => n.id !== note.id);
+      state.activeId = state.notes[0]?.id ?? null;
+      persist(); renderList(); renderEditor(); updateCharCount();
+    }
+  }
+
+  /* ---------- PIN crypto ---------- */
+  const MAX_FAILS = 5;
+  const QUICK_WINDOW_MS = 2 * 60 * 1000;
+  const FINGER_SVG = '<svg viewBox="0 0 24 24"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg>';
+
+  const constEq = (a, b) => {
+    a = String(a); b = String(b);
+    if (a.length !== b.length) return false;
+    let diff = 0;
+    for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    return diff === 0;
+  };
+
+  async function hashPin(pin, saltB64, iterations = SecurityFiber.ITER_OLD) {
+    const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: b64.dec(saltB64), iterations, hash: 'SHA-256' }, key, 256);
+    return b64.enc(bits);
+  }
+
+  async function setPin(pin) {
+    if (HAS_SUBTLE) {
+      const salt = b64.enc(crypto.getRandomValues(new Uint8Array(16)));
+      state.prefs.pinSalt = salt;
+      state.prefs.pinIter = SecurityFiber.ITER_NEW;
+      state.prefs.pinHash = await hashPin(pin, salt, SecurityFiber.ITER_NEW);
+      state.prefs.pin = null;
+    } else {
+      state.prefs.pin = pin;
+      state.prefs.pinHash = null;
+      state.prefs.pinSalt = null;
+    }
+    persist();
+  }
+
+  async function checkPin(pin) {
+    if (state.prefs.pinHash && state.prefs.pinSalt && HAS_SUBTLE) {
+      const iter = SecurityFiber.iterFor(state.prefs);
+      const ok = constEq(await hashPin(pin, state.prefs.pinSalt, iter), state.prefs.pinHash);
+      if (ok && iter !== SecurityFiber.ITER_NEW) { try { await setPin(pin); } catch {} }
+      return ok;
+    }
+    if (state.prefs.pin) {
+      const ok = constEq(pin, state.prefs.pin);
+      if (ok && HAS_SUBTLE) await setPin(pin);
+      return ok;
+    }
+    return false;
+  }
+
+  const lockoutSeconds = () => Math.max(0, Math.ceil(((state.prefs.lockUntil ?? 0) - Date.now()) / 1000));
+  const fmtWait = (s) => s >= 60 ? `${Math.floor(s / 60)}m ${s % 60}s` : `${s}s`;
+
+  async function tryPin(pin) {
+    const wait = lockoutSeconds();
+    if (wait > 0) return { ok: false, wait, left: 0 };
+    if (!SecurityFiber.enter()) return { ok: false, wait: 0, left: Math.max(0, MAX_FAILS - (state.prefs.failCount ?? 0)) };
+    let good = false;
+    try { good = await checkPin(pin); } finally { SecurityFiber.leave(); }
+    if (good) {
+      state.prefs.failCount = 0; state.prefs.lockUntil = 0;
+      persist();
+      return { ok: true, wait: 0, left: MAX_FAILS };
+    }
+    state.prefs.failCount = (state.prefs.failCount ?? 0) + 1;
+    if (state.prefs.failCount >= MAX_FAILS) {
+      const secs = Math.min(30 * 2 ** (state.prefs.failCount - MAX_FAILS), 900);
+      state.prefs.lockUntil = Date.now() + secs * 1000;
+    }
+    persist();
+    return { ok: false, wait: lockoutSeconds(), left: Math.max(0, MAX_FAILS - state.prefs.failCount) };
+  }
+
+  function clearLockPrefs() {
+    Object.assign(state.prefs, {
+      pin: null, pinHash: null, pinSalt: null,
+      biometric: false, credentialId: null, bioPublicKey: null,
+      quickUnlock: false, failCount: 0, lockUntil: 0
+    });
+  }
+
+  /* ---------- Lock screen ---------- */
+  let quickUntil = 0;
+
+  function initCustomLock() {
+    const lockScreen = document.getElementById('lockScreen');
+    const dots = [...document.querySelectorAll('.pin-dot')];
+    const keypad = document.getElementById('keypad');
+    const lockMsg = document.getElementById('lockMsg');
+    const bioBtn = keypad.querySelector('[data-action="bio"]');
+    const forgotModal = document.getElementById('forgotPinModal');
+    const appRoot = document.getElementById('app');
+
+    let msgTimer = null;
+    let lockoutTimer = null;
+    let quickTimer = null;
+    let verifying = false;
+
+    // FIX: only lock if a *valid* PIN or biometric exists
+    const lockOn = () => hasPin() || hasValidBiometric();
+
+    function showLockMsg(text) {
+      if (!lockMsg || lockoutTimer) return;
+      lockMsg.textContent = text;
+      if (msgTimer) clearTimeout(msgTimer);
+      msgTimer = setTimeout(() => { lockMsg.textContent = ''; }, 3500);
+    }
+    function clearLockMsg() { if (!lockMsg) return; lockMsg.textContent = ''; if (msgTimer) clearTimeout(msgTimer); }
+    function updateDots() { dots.forEach((dot, idx) => { dot.classList.toggle('filled', idx < currentPinEntry.length); dot.classList.remove('error'); }); }
+    function setNumKeysDisabled(flag) { keypad.querySelectorAll('[data-num],[data-action="del"]').forEach(b => { b.disabled = flag; }); }
+
+    function bioMode() {
+      if (hasValidBiometric() && bioSupport().ok) return 'real';
+      if (state.prefs.quickUnlock && state.prefs.autoLock && hasPin() && Date.now() < quickUntil) return 'quick';
+      return null;
+    }
+
+    function refreshKey() {
+      if (!bioBtn) return;
+      const mode = bioMode();
+      bioBtn.style.visibility = mode ? 'visible' : 'hidden';
+      if (!bioBtn.disabled) bioBtn.innerHTML = mode === 'quick' ? ICONS.unlock : FINGER_SVG;
+      bioBtn.setAttribute('aria-label', mode === 'quick' ? 'Quick unlock' : 'Unlock with biometrics');
+      bioBtn.title = mode === 'quick' ? 'Quick unlock (not biometric)' : 'Unlock with biometrics';
+      if (quickTimer) { clearTimeout(quickTimer); quickTimer = null; }
+      if (mode === 'quick') quickTimer = setTimeout(refreshKey, Math.max(0, quickUntil - Date.now()) + 50);
+    }
+
+    function runLockoutCountdown() {
+      if (lockoutTimer) clearInterval(lockoutTimer);
+      const tick = () => {
+        const sec = lockoutSeconds();
+        if (sec <= 0) {
+          if (lockoutTimer) { clearInterval(lockoutTimer); lockoutTimer = null; }
+          lockMsg.textContent = ''; setNumKeysDisabled(false); return;
+        }
+        lockMsg.textContent = `Too many wrong PINs. Try again in ${fmtWait(sec)}.`;
+        setNumKeysDisabled(true);
+      };
+      lockoutTimer = setInterval(tick, 1000);
+      tick();
+    }
+
+    function unlockApp() {
+      currentPinEntry = '';
+      updateDots(); clearLockMsg();
+      if (lockoutTimer) { clearInterval(lockoutTimer); lockoutTimer = null; }
+      setNumKeysDisabled(false);
+      quickUntil = 0;
+      lockScreen.hidden = true;
+      appRoot.style.display = '';
+      appRoot.classList.remove('viewing');
+      scheduleUpdateModalIfNeeded();
+    }
+
+    function lockApp() {
+      currentPinEntry = '';
+      updateDots(); clearLockMsg();
+      document.querySelectorAll('dialog.modal[open]').forEach(m => m.close());
+      lockScreen.hidden = false;
+      appRoot.style.display = 'none';
+      appRoot.classList.remove('viewing');
+      refreshKey();
+      if (lockoutSeconds() > 0) runLockoutCountdown(); else setNumKeysDisabled(false);
+    }
+
+    // FIX: If lock is not configured, never show it
+    if (lockOn()) lockApp();
+    else { lockScreen.hidden = true; appRoot.style.display = ''; }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState !== 'hidden') return;
+      if (state.prefs.autoSave) persist();
+      if (!lockScreen.hidden || !lockOn() || !state.prefs.autoLock) return;
+      if (Date.now() - (window.__inkPicking || 0) < 120000) return;
+      quickUntil = Date.now() + QUICK_WINDOW_MS;
+      lockApp();
+    });
+
+    async function verifyPinEntry() {
+      if (verifying) return;
+      verifying = true;
+      const r = await tryPin(currentPinEntry);
+      verifying = false;
+      if (r.ok) { unlockApp(); return; }
+      dots.forEach(d => d.classList.add('error'));
+      try { if (navigator.vibrate) navigator.vibrate(120); } catch {}
+      setTimeout(() => { currentPinEntry = ''; updateDots(); }, 420);
+      if (r.wait > 0) runLockoutCountdown();
+      else if (r.left > 0 && r.left <= 2) showLockMsg(`Wrong PIN. ${r.left} ${r.left === 1 ? 'try' : 'tries'} left before a timeout.`);
+    }
+
+    keypad.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.key-btn');
+      if (!btn || lockScreen.hidden || btn.disabled) return;
+      if (btn.dataset.num != null) {
+        if (currentPinEntry.length >= 4 || verifying) return;
+        currentPinEntry += btn.dataset.num;
+        updateDots();
+        if (currentPinEntry.length === 4) setTimeout(verifyPinEntry, 10);
+        return;
+      }
+      if (btn.dataset.action === 'del') { currentPinEntry = currentPinEntry.slice(0, -1); updateDots(); return; }
+      if (btn.dataset.action === 'bio') {
+        const mode = bioMode();
+        if (!mode) return;
+        if (mode === 'quick') { if (lockoutSeconds() > 0) return; unlockApp(); return; }
+        btn.disabled = true;
+        const original = btn.innerHTML;
+        btn.innerHTML = '<div class="spinner"></div>';
+        const res = await verifyBiometric();
+        btn.innerHTML = original; btn.disabled = false;
+        if (res.ok) unlockApp(); else showLockMsg(res.msg);
+      }
+    });
+
+    document.getElementById('btnForgotPin').onclick = () => {
+      const real = hasValidBiometric() && bioSupport().ok;
+      document.getElementById('forgotMsg').textContent = real
+        ? 'Your biometrics are checked first. Then the lock is removed and your notes are kept.'
+        : 'Resetting removes the lock and permanently erases ALL notes and lists on this device. This cannot be undone.';
+      document.getElementById('btnConfirmResetPin').textContent = real ? 'Verify & Reset' : 'Erase & Reset';
+      forgotModal.showModal();
+    };
+    forgotModal.querySelectorAll('[data-close-forgot]').forEach(el => { el.onclick = () => forgotModal.close(); });
+    forgotModal.onclick = (e) => { if (e.target === forgotModal) forgotModal.close(); };
+    document.getElementById('btnConfirmResetPin').onclick = async () => {
+      if (hasValidBiometric() && bioSupport().ok) {
+        const res = await verifyBiometric();
+        if (!res.ok) { forgotModal.close(); showLockMsg(res.msg); return; }
+      } else {
+        state.notes = []; state.activeId = null;
+      }
+      clearLockPrefs(); persist(); updateBioStatus();
+      renderList(); renderEditor(); updateCharCount();
+      forgotModal.close(); unlockApp();
+    };
+
+    window.__inkLock = lockApp;
+  }
+
+  /* ---------- Settings lock ---------- */
+  function initSettingsLock() {
+    const setupModal = document.getElementById('setupPinModal');
+    const removeModal = document.getElementById('removeLockModal');
+    const newPinInput = document.getElementById('newPinInput');
+    const verifyPinInput = document.getElementById('verifyPinInput');
+    const PLUS_SVG = '<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+    let bioNoteTimer = null;
+    function setBioNote(text) {
+      const el = document.getElementById('bioStatusDesc');
+      if (!el) return;
+      el.textContent = text; el.style.color = 'var(--danger)';
+      if (bioNoteTimer) clearTimeout(bioNoteTimer);
+      bioNoteTimer = setTimeout(updateBioStatus, 7000);
+    }
+
+    document.getElementById('btnSetupPin').onclick = () => {
+      newPinInput.value = ''; newPinInput.style.borderColor = '';
+      setupModal.showModal();
+      setTimeout(() => newPinInput.focus(), 120);
+    };
+
+    document.getElementById('btnSetupBio').onclick = async () => {
+      const btn = document.getElementById('btnSetupBio');
+      if (btn.disabled) return;
+      if (!hasPin()) { setBioNote('Set a PIN first. It is your backup if biometrics fail.'); return; }
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;"></div>';
+      const res = await enrollBiometric();
+      btn.innerHTML = PLUS_SVG; btn.disabled = false;
+      updateBioStatus();
+      if (!res.ok) setBioNote(res.msg);
+    };
+
+    document.getElementById('btnRemoveLock').onclick = () => {
+      verifyPinInput.value = ''; verifyPinInput.placeholder = '••••'; verifyPinInput.style.borderColor = '';
+      removeModal.showModal();
+    };
+
+    setupModal.querySelectorAll('[data-close-setup]').forEach(el => { el.onclick = () => setupModal.close(); });
+    setupModal.onclick = (e) => { if (e.target === setupModal) setupModal.close(); };
+    document.getElementById('btnSavePin').onclick = async () => {
+      const pin = newPinInput.value.trim();
+      if (!/^\d{4}$/.test(pin)) {
+        newPinInput.style.borderColor = 'var(--danger)';
+        setTimeout(() => { newPinInput.style.borderColor = ''; }, 1200);
+        return;
+      }
+      await setPin(pin);
+      state.prefs.failCount = 0; state.prefs.lockUntil = 0;
+      persist(); setupModal.close(); updateBioStatus();
+    };
+
+    removeModal.querySelectorAll('[data-close-remove]').forEach(el => { el.onclick = () => removeModal.close(); });
+    removeModal.onclick = (e) => { if (e.target === removeModal) removeModal.close(); };
+    document.getElementById('btnConfirmRemoveLock').onclick = async () => {
+      const r = await tryPin(verifyPinInput.value.trim());
+      if (r.ok) {
+        clearLockPrefs(); persist(); updateBioStatus();
+        removeModal.close();
+        document.getElementById('lockScreen').hidden = true;
+        document.getElementById('app').style.display = '';
+      } else {
+        verifyPinInput.style.borderColor = 'var(--danger)';
+        verifyPinInput.value = '';
+        verifyPinInput.placeholder = r.wait > 0 ? `Locked ${fmtWait(r.wait)}` : '••••';
+        setTimeout(() => { verifyPinInput.style.borderColor = ''; }, 1200);
+      }
+    };
+
+    document.getElementById('toggleAutoLock').onchange = (e) => {
+      state.prefs.autoLock = e.target.checked;
+      if (!state.prefs.autoLock) state.prefs.quickUnlock = false;
+      persist(); updateBioStatus();
+    };
+    document.getElementById('toggleQuick').onchange = (e) => {
+      state.prefs.quickUnlock = !!(e.target.checked && hasPin() && state.prefs.autoLock);
+      persist(); updateBioStatus();
+    };
+  }
+
+  /* ---------- Feedback ---------- */
+  const FB_TYPE_LABELS = { bug: 'Bug Report', feature: 'Feature Idea', general: 'General', praise: 'Praise' };
+  const OK_ICON = '<svg viewBox="0 0 24 24" style="width:48px;height:48px;stroke-width:2;"><polyline points="20 6 9 17 4 12"/></svg>';
+  const WARN_ICON = '<svg viewBox="0 0 24 24" style="width:48px;height:48px;stroke-width:2;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+
+  function openMailto(url) {
+    try {
+      const a = document.createElement('a');
+      a.href = url; a.style.cssText = 'position:fixed;opacity:0;pointer-events:none;';
+      document.body.appendChild(a); a.click(); a.remove();
+    } catch { try { location.href = url; } catch {} }
+  }
+
+  function buildMailtoUrl(entry) {
+    const typeLabel = FB_TYPE_LABELS[entry.type] ?? 'General';
+    const subject = `[Ink-Lite] ${typeLabel} — ${entry.id}`;
+    const lines = [
+      `Reference: ${entry.id}`, `Type: ${typeLabel}`, `Date: ${new Date(entry.createdAt).toLocaleString()}`,
+      `From: ${entry.email || '(not provided)'}`, '', 'Message:', entry.message, '', '--', 'Sent from Ink-Lite'
+    ];
+    return `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\r\n'))}`;
+  }
+
+  /* Sends the feedback e-mail in the background and reports what REALLY happened:
+       delivered         -> the mail service confirmed it
+       submitted         -> sent, but the browser does not let the app read the reply
+       needs_activation  -> FormSubmit wants a one-time "Activate" click in the inbox
+       offline / failed  -> not sent; saved and retried automatically                 */
+  const FB_RETRY_STATES = ['needs_activation', 'offline', 'failed'];
+
+  function feedbackFields(entry) {
+    return {
+      _subject: `[Ink-Lite] ${FB_TYPE_LABELS[entry.type] ?? 'General'} — ${entry.id}`,
+      _template: 'table', _captcha: 'false',
+      reference: entry.id, type: FB_TYPE_LABELS[entry.type] ?? 'General',
+      message: entry.message, ...(entry.email ? { email: entry.email } : {}),
+      sent_at: new Date(entry.createdAt).toISOString(), source: 'Ink-Lite web app'
+    };
+  }
+
+  async function timedFetch(url, opts, ms = 30000) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), ms);
+    try { return await fetch(url, { ...opts, signal: ctrl.signal }); }
+    finally { clearTimeout(timer); }
+  }
+
+  // A normal HTML form POST into a hidden frame. It is page navigation, not fetch(), so the
+  // browser's CORS / file:// rules that block fetch() do not apply to it.
+  async function sendViaForm(entry) {
+    const f = feedbackFields(entry);
+    const name = 'fbframe' + Date.now();
+    const iframe = document.createElement('iframe');
+    iframe.name = name; iframe.setAttribute('aria-hidden', 'true'); iframe.tabIndex = -1;
+    iframe.style.cssText = 'position:fixed;width:1px;height:1px;left:-9999px;top:0;border:0;opacity:0;pointer-events:none;';
+    const form = document.createElement('form');
+    form.method = 'POST'; form.action = `https://formsubmit.co/${FEEDBACK_EMAIL}`; form.target = name; form.acceptCharset = 'UTF-8'; form.style.display = 'none';
+    for (const [k, v] of Object.entries(f)) {
+      const i = document.createElement('input'); i.type = 'hidden'; i.name = k; i.value = String(v); form.appendChild(i);
+    }
+    document.body.append(iframe, form);
+    await new Promise(r => setTimeout(r, 80));          // let the empty frame finish its own load first
+    return new Promise((resolve) => {
+      let finished = false;
+      const done = (ok) => {
+        if (finished) return; finished = true;
+        clearTimeout(timer);
+        setTimeout(() => { iframe.remove(); form.remove(); }, 500);
+        resolve(ok);
+      };
+      const timer = setTimeout(() => done(true), 25000);
+      iframe.addEventListener('load', () => done(true));
+      try { form.submit(); } catch { done(false); }
+    });
+  }
+
+  async function sendBackgroundCopy(entry) {
+    const f = feedbackFields(entry);
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return { state: 'offline' };
+
+    // 1) Web3Forms: optional, instant, no activation (only if WEB3FORMS_KEY is filled in).
+    if (WEB3FORMS_KEY) {
+      try {
+        const res = await timedFetch('https://api.web3forms.com/submit', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject: f._subject, from_name: 'Ink-Lite', reference: f.reference, type: f.type, message: f.message, ...(entry.email ? { email: entry.email } : {}), sent_at: f.sent_at })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.success) return { state: 'delivered' };
+      } catch {}
+    }
+
+    // 2) FormSubmit with a readable reply (form-encoded = simple request, no CORS preflight).
+    let why = '';
+    try {
+      const res = await timedFetch(FORMSUBMIT_ENDPOINT, { method: 'POST', mode: 'cors', cache: 'no-store', headers: { Accept: 'application/json' }, body: new URLSearchParams(f) });
+      const data = await res.json().catch(() => null);
+      const msg = String(data?.message ?? '');
+      if (data && (data.success === true || data.success === 'true')) return { state: 'delivered' };
+      if (/activat/i.test(msg)) return { state: 'needs_activation', detail: msg };
+      return { state: 'failed', detail: msg || ('HTTP ' + res.status) };
+    } catch (err) {
+      // A timeout means the server was reached but slow: do not send a duplicate.
+      if (err && err.name === 'AbortError') return { state: 'submitted', detail: 'the mail service answered slowly' };
+      why = String((err && (err.name + ': ' + err.message)) || err || 'blocked');
+    }
+
+    // 3) fetch() was blocked by the browser (typical for file:// pages): use the form transport.
+    const ok = await sendViaForm(entry);
+    return ok ? { state: 'submitted', detail: why } : { state: 'failed', detail: why || 'form could not be sent' };
+  }
+
+  const PENDING_KEY = 'ink-lite.feedback.pending.v1';
+  const getPending = () => { try { return JSON.parse(localStorage.getItem(PENDING_KEY) ?? '[]'); } catch { return []; } };
+  const setPending = (arr) => { try { localStorage.setItem(PENDING_KEY, JSON.stringify(arr)); } catch {} };
+
+  async function sendWithRetry(entry) {
+    let r = await sendBackgroundCopy(entry);
+    if (r.state === 'failed') {
+      await new Promise(res => setTimeout(res, 1500));
+      r = await sendBackgroundCopy(entry);
+    }
+    return r;
+  }
+
+  let flushing = false;
+  async function flushPendingFeedback() {
+    if (flushing || (typeof navigator !== 'undefined' && navigator.onLine === false)) return;
+    const pending = getPending();
+    if (!pending.length) return;
+    flushing = true;
+    try {
+      const remaining = [];
+      let blocked = false;
+      for (const entry of pending) {
+        if (blocked) { remaining.push(entry); continue; }
+        const r = await sendBackgroundCopy(entry);
+        if (FB_RETRY_STATES.includes(r.state)) remaining.push(entry);
+        if (r.state === 'needs_activation' || r.state === 'offline') blocked = true;
+      }
+      setPending(remaining);
+    } finally { flushing = false; }
+  }
+
+  function initFeedback() {
+    const modal = document.getElementById('feedbackModal');
+    const form = document.getElementById('feedbackForm');
+    const successEl = document.getElementById('feedbackSuccess');
+    const msgEl = document.getElementById('fbMessage');
+    const emailEl = document.getElementById('fbEmail');
+    const charCountEl = document.getElementById('fbCharCount');
+    const refEl = document.getElementById('fbRef');
+    const deliveredEl = document.getElementById('fbDelivered');
+    const iconEl = document.getElementById('fbIcon');
+    const titleEl = document.getElementById('fbTitle');
+    const copyBtn = document.getElementById('fbCopyRef');
+    const reopenBtn = document.getElementById('fbReopenMail');
+    const openBtn = document.getElementById('btnSidebarFeedback');
+    const submitBtn = document.getElementById('fbSubmit');
+
+    flushPendingFeedback();
+    window.addEventListener('online', flushPendingFeedback);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') flushPendingFeedback(); });
+    let fbType = 'general';
+    let lastMailtoUrl = '';
+    let fbVersion = 0;
+
+    modal.querySelectorAll('[data-fb-type]').forEach(btn => {
+      btn.onclick = () => {
+        modal.querySelectorAll('[data-fb-type]').forEach(b => b.setAttribute('aria-pressed', 'false'));
+        btn.setAttribute('aria-pressed', 'true');
+        fbType = btn.dataset.fbType;
+      };
+    });
+    msgEl.addEventListener('input', () => { charCountEl.textContent = `${msgEl.value.length} / 2000`; });
+
+    const setStatus = (text, color) => { if (deliveredEl) { deliveredEl.textContent = text; deliveredEl.style.color = color || 'var(--muted)'; } };
+    const setIcon = (kind) => {
+      if (!iconEl) return;
+      if (kind === 'warn') { iconEl.innerHTML = WARN_ICON; iconEl.style.color = 'var(--danger)'; }
+      else { iconEl.innerHTML = OK_ICON; iconEl.style.color = '#10b981'; }
+    };
+
+    function resetForm() {
+      fbVersion++;
+      msgEl.value = ''; emailEl.value = ''; charCountEl.textContent = '0 / 2000';
+      msgEl.style.borderColor = '';
+      form.hidden = false; successEl.hidden = true; lastMailtoUrl = '';
+      setStatus('', 'var(--muted)'); setIcon('ok');
+      if (titleEl) titleEl.textContent = 'Thank you!';
+      modal.querySelectorAll('[data-fb-type]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.fbType === 'general')));
+      fbType = 'general';
+      submitBtn.disabled = false; submitBtn.textContent = 'Submit Feedback';
+    }
+
+    openBtn.onclick = () => { resetForm(); modal.showModal(); setTimeout(() => msgEl.focus(), 80); };
+    modal.querySelectorAll('[data-close-feedback]').forEach(el => { el.onclick = () => modal.close(); });
+    modal.onclick = (e) => { if (e.target === modal) modal.close(); };
+    copyBtn.onclick = async () => {
+      try {
+        if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(refEl.textContent);
+        else throw 0;
+        copyBtn.textContent = 'Copied';
+      } catch {
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = refEl.textContent; ta.style.cssText = 'position:fixed;opacity:0;';
+          document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+          copyBtn.textContent = 'Copied';
+        } catch { copyBtn.textContent = 'Copy failed'; }
+      }
+      setTimeout(() => { copyBtn.textContent = 'Copy Reference'; }, 1500);
+    };
+    reopenBtn.onclick = () => { if (lastMailtoUrl) openMailto(lastMailtoUrl); };
+
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      const message = msgEl.value.trim();
+      if (!message) { msgEl.focus(); msgEl.style.borderColor = 'var(--danger)'; setTimeout(() => { msgEl.style.borderColor = ''; }, 1500); return; }
+      if (!/^[a-z0-9._%+-]+@(gmail|googlemail)\.com$/i.test(emailEl.value.trim())) { emailEl.focus(); emailEl.style.borderColor = 'var(--danger)'; setStatus('A Gmail address is required so we can write back.', 'var(--danger)'); setTimeout(() => { emailEl.style.borderColor = ''; }, 2000); alert('Please enter your Gmail address so we can write back.'); return; }
+      if (submitBtn.disabled) return;
+      submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
+      const entry = {
+        id: `FB-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
+        type: fbType, message, email: emailEl.value.trim(), createdAt: Date.now()
+      };
+      try {
+        const arr = JSON.parse(localStorage.getItem(FEEDBACK_KEY) ?? '[]');
+        arr.push(entry);
+        localStorage.setItem(FEEDBACK_KEY, JSON.stringify(arr));
+      } catch (err) { console.warn('Feedback save failed', err); }
+      lastMailtoUrl = buildMailtoUrl(entry);
+      refEl.textContent = entry.id;
+      form.hidden = true; successEl.hidden = false;
+      setIcon('ok'); if (titleEl) titleEl.textContent = 'Thank you!';
+      setStatus('Sending to super.kennz@yahoo.com…', 'var(--muted)');
+      const myVersion = ++fbVersion;
+      sendWithRetry(entry).then(r => {
+        if (FB_RETRY_STATES.includes(r.state)) setPending([...getPending(), entry]);
+        if (myVersion !== fbVersion) return;
+        if (r.state === 'delivered') {
+          setIcon('ok'); if (titleEl) titleEl.textContent = 'Thank you!';
+          setStatus('Delivered automatically to ' + FEEDBACK_EMAIL, '#10b981');
+        } else if (r.state === 'submitted') {
+          setIcon('ok'); if (titleEl) titleEl.textContent = 'Thank you!';
+          setStatus('Sent to ' + FEEDBACK_EMAIL + '. This browser does not let the app confirm delivery, so if it is not in the inbox in a few minutes: check Spam, tap Activate in the first FormSubmit e-mail (one time only), or tap "Send via Mail App".' + (r.detail ? ' [' + r.detail + ']' : ''), 'var(--muted)');
+        } else if (r.state === 'needs_activation') {
+          setIcon('warn'); if (titleEl) titleEl.textContent = 'One-time activation needed';
+          setStatus('FormSubmit just e-mailed an activation link to ' + FEEDBACK_EMAIL + ' (check Spam too). Tap Activate once. Your feedback is saved and will be sent automatically afterwards.', 'var(--danger)');
+        } else if (r.state === 'offline') {
+          setIcon('warn'); if (titleEl) titleEl.textContent = 'No connection';
+          setStatus('Your device reports no internet connection. Your feedback is saved and will be sent automatically when it is back.', 'var(--danger)');
+        } else {
+          setIcon('warn'); if (titleEl) titleEl.textContent = 'Almost there…';
+          setStatus('The mail service said: ' + (r.detail || 'unknown error') + '. Saved and will retry automatically, or tap "Send via Mail App".', 'var(--danger)');
+        }
+      });
+      submitBtn.disabled = false; submitBtn.textContent = 'Submit Feedback';
+    };
+  }
+
+  /* ---------- Settings nav ---------- */
+  function initSettingsNavigation() {
+    const menuView = document.getElementById('settingsMenuView');
+    const subViews = document.querySelectorAll('.settings-view:not(#settingsMenuView)');
+    document.querySelectorAll('.settings-menu-item').forEach(item => {
+      item.onclick = () => {
+        menuView.classList.remove('active');
+        document.getElementById(`settings-${item.dataset.target}`)?.classList.add('active');
+      };
+    });
+    document.querySelectorAll('[data-back-settings]').forEach(btn => {
+      btn.onclick = () => { subViews.forEach(v => v.classList.remove('active')); menuView.classList.add('active'); };
+    });
+  }
+
+  /* ---------- Update modal scheduling ---------- */
+  const BOOT_AT = Date.now();
+  let updateScheduled = false;
+  let updateShownThisLaunch = false;
+  function scheduleUpdateModalIfNeeded() {
+    if (updateScheduled || updateShownThisLaunch) return;
+    try { if (localStorage.getItem(UPDATE_KEY)) return; } catch {}
+    updateScheduled = true;
+    // wait for the loading screen to finish, and at least 600ms after unlock
+    const delay = Math.max(600, 2100 - (Date.now() - BOOT_AT));
+    setTimeout(() => {
+      updateScheduled = false;
+      const lockScreen = document.getElementById('lockScreen');
+      if (!lockScreen || !lockScreen.hidden) return;      // still locked
+      if (document.querySelector('dialog.modal[open]')) return;
+      try {
+        if (localStorage.getItem(UPDATE_KEY)) return;
+        document.getElementById('updateModal').showModal();
+        updateShownThisLaunch = true;                      // once per app launch
+      } catch (e) { console.warn('Update modal error', e); }
+    }, delay);
+  }
+
+  function bind() {
+    document.querySelectorAll('#updateModal button').forEach(b => b.addEventListener('click', () => {
+      try { localStorage.setItem(UPDATE_KEY, 'true'); } catch {}
+    }));
+    document.getElementById('btnSidebarSettings').onclick = () => {
+      document.querySelectorAll('.settings-view').forEach(v => v.classList.remove('active'));
+      document.getElementById('settingsMenuView').classList.add('active');
+      settingsModal.showModal();
+    };
+    document.querySelectorAll('[data-close-settings]').forEach(el => { el.onclick = () => settingsModal.close(); });
+    settingsModal.onclick = (e) => { if (e.target === settingsModal) settingsModal.close(); };
+
+    document.getElementById('toggleAutoSave').onchange = (e) => {
+      state.prefs.autoSave = e.target.checked;
+      applyPrefs(); persist();
+      if (state.activeId) renderEditor(true);
+    };
+
+    document.querySelectorAll('.option-btn[data-theme]').forEach(btn => {
+      btn.onclick = () => { state.prefs.theme = btn.dataset.theme; applyPrefs(); persist(); };
+    });
+    document.querySelectorAll('.option-btn[data-font]').forEach(btn => {
+      btn.onclick = () => { state.prefs.font = btn.dataset.font; applyPrefs(); persist(); };
+    });
+
+    btnAddEl.onclick = (e) => {
+      e.stopPropagation();
+      const isOpen = fabMenu.classList.contains('is-open');
+      fabMenu.classList.toggle('is-open', !isOpen);
+      btnAddEl.classList.toggle('is-open', !isOpen);
+    };
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.fab-container')) { fabMenu.classList.remove('is-open'); btnAddEl.classList.remove('is-open'); }
+    });
+    fabMenu.querySelector('[data-action="note"]').onclick = () => { createNew('note'); fabMenu.classList.remove('is-open'); btnAddEl.classList.remove('is-open'); };
+    fabMenu.querySelector('[data-action="todo"]').onclick = () => { createNew('todo'); fabMenu.classList.remove('is-open'); btnAddEl.classList.remove('is-open'); };
+
+    function createNew(type) {
+      if (state.notes.length >= 35) { alert('Storage limit reached. Maximum 35 notes allowed.'); return; }
+      const n = { id: uid(), type, title: '', body: '', items: [], pinned: false, locked: false, updatedAt: Date.now(), images: [] };
+      state.notes.unshift(n); state.activeId = n.id;
+      persist(); renderList(); renderEditor();
+    }
+
+    searchEl.oninput = (e) => { state.query = e.target.value; renderList(); };
+    document.querySelectorAll('.filters button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.filters button').forEach(b => b.setAttribute('aria-pressed', 'false'));
+        btn.setAttribute('aria-pressed', 'true');
+        state.filter = btn.dataset.filter; renderList();
+      };
+    });
+
+    listEl.onclick = (e) => {
+      const item = e.target.closest('.note-item');
+      if (!item) return;
+      state.activeId = item.dataset.id;
+      persist(); renderList(); renderEditor();
+    };
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || !appEl.classList.contains('viewing')) return;
+      if (document.querySelector('dialog.modal[open]')) return;
+      appEl.classList.remove('viewing');
+    });
+
+    initFeedback();
+    initSettingsLock();
+    initSettingsNavigation();
+  }
+
+  function boot() {
+    try { AIHandler.boot(); } catch {}
+    try { load(); } catch (e) { console.warn('load failed', e); }
+    try { renderList(); } catch (e) { console.warn(e); }
+    try { renderEditor(); } catch (e) { console.warn(e); }
+    appEl.classList.remove('viewing');
+    try { bind(); } catch (e) { console.warn(e); }
+
+    try {
+      initCustomLock();
+    } catch (e) {
+      console.warn('Lock init failed', e);
+      const lockScreen = document.getElementById('lockScreen');
+      if (hasPin() || hasValidBiometric()) {
+        lockScreen.hidden = false;
+        document.getElementById('lockMsg').textContent = 'The lock could not start. Reload the page.';
+        document.getElementById('app').style.display = 'none';
+      } else {
+        lockScreen.hidden = true;
+        document.getElementById('app').style.display = '';
+      }
+    }
+
+    setTimeout(() => { document.getElementById('loader').classList.add('is-done'); }, 1600);
+
+    // FIX: Only show update modal when app is unlocked
+    const lockScreen = document.getElementById('lockScreen');
+    if (lockScreen && lockScreen.hidden) scheduleUpdateModalIfNeeded();
+  }
+
+  boot();
+
+/* ===================================================================
+   INK-LITE VIP ADD-ON  (v3: SVG look, plans, hidden discount codes)
+   PASTE THIS WHOLE BLOCK inside the module script, BELOW the last
+   boot();  and ABOVE  })();  (at the end of that script).
+   If anything here fails, Ink-Lite still runs; see the console.
+   =================================================================== */
+(function vipAddon() {
+ try {
+  /* ---------- 1. YOUR SETTINGS ---------- */
+  // One checkout link per plan (Stripe Payment Link, PayPal, Lemon Squeezy...).
+  const VIP_PAYMENT_URLS = {
+    monthly:    'https://buy.stripe.com/test_dRm28r5uV97Q8VOb0tfbq00',
+    yearly:     'https://buy.stripe.com/test_dRmdR9e1rabU1tmgkNfbq01',
+    membership: 'https://buy.stripe.com/test_fZu8wP6yZfwefkc0lPfbq02'
+  };
+  // Prices in cents.
+  const PLANS = [
+    { id: 'monthly',    name: 'Monthly',    tag: '/ month',    cents: 890,  per: '/ month', ico: 'cal1' },
+    { id: 'yearly',     name: 'Yearly',     tag: '/ year',     cents: 1090, per: '/ year',  ico: 'cal3' },
+    { id: 'membership', name: 'Member',     tag: 'membership', cents: 1590, per: '',        ico: 'gem'  }
+  ];
+  // Discount codes are stored ONLY as SHA-256 hashes, so nobody can read them here.
+  // Create the same codes as promotion codes in your payment provider so the discount is charged at checkout.
+  const DISCOUNT_HASHES = {
+    'a41332387caffe98768c2d694d0e66b65fcba0bb7f69a432424a96aa7368b4ad': 45,
+    'b256fef0b0b7af4d9f91ab699ee10037184dd681ea964f2dca56350b1e1c403a': 30,
+    '4e473fa492cb1b61cad33720c96cab4e440519671881d11d3a615ac039d72ecf': 40
+  };
+  // Activation codes you send to clients AFTER they pay (hashes of UPPERCASE codes).
+  // crypto.subtle.digest('SHA-256', new TextEncoder().encode('YOUR-CODE')).then(b=>console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
+  const VIP_CODE_HASHES = [
+    '21cce78be9583cdd50b7524a16dad09867dd9c80da65306dda8e376553227871'   // owner
+  ];
+  const MAX_PHOTOS = 6;
+
+  /* ---------- 2. HELPERS ---------- */
+  const root = document.documentElement;
+  const isVip = () => state.prefs.vip === true;
+  const maxChars = () => (isVip() ? 100000 : 25350);
+  const maxNotes = () => (isVip() ? 50 : 35);
+  const $ = (id) => document.getElementById(id);
+  const sha = async (s) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))].map((b) => b.toString(16).padStart(2, '0')).join('');
+  const money = (c) => '$' + (c / 100).toFixed(2);
+  const gem = (cx, cy, f) => '<circle cx="' + cx + '" cy="' + cy + '" r="1.3" fill="' + f + '" stroke="#92400e" stroke-width=".8"/>';
+  const CROWN_BODY = '<path d="M2.6 8.2l4.9 4L12 4.2l4.5 8 4.9-4-1.9 11H4.5z" fill="url(#vipGold)" stroke="#92400e" stroke-width="1.2" stroke-linejoin="round"/><path d="M4.9 16.4h14.2" fill="none" stroke="#92400e" stroke-width="1.2" stroke-linecap="round"/>' + gem(12, 12.6, '#fff7d6') + gem(2.6, 8.2, '#fde68a') + gem(21.4, 8.2, '#fde68a') + gem(12, 4.2, '#fde68a');
+  const CROWN = '<svg class="crown" viewBox="0 0 24 24">' + CROWN_BODY + '</svg>';
+  const spark = (x, y, s, d) => '<g transform="translate(' + x + ' ' + y + ') scale(' + s + ')"><path class="vip-spark" style="animation-delay:' + d + 's" d="M0-6C.8-2 2-.8 6 0 2 .8.8 2 0 6-.8 2-2 .8-6 0-2-.8-.8-2 0-6z" fill="#fde68a" stroke="none"/></g>';
+  const HERO = '<svg class="vip-art" viewBox="0 0 240 118" aria-hidden="true"><defs><radialGradient id="vipGlow"><stop offset="0" stop-color="#fbbf24" stop-opacity=".6"/><stop offset="1" stop-color="#fbbf24" stop-opacity="0"/></radialGradient></defs>'
+    + '<circle cx="120" cy="58" r="62" fill="url(#vipGlow)" stroke="none"/><ellipse cx="120" cy="104" rx="46" ry="5" fill="#000" fill-opacity=".14" stroke="none"/>'
+    + '<g transform="translate(78 14) scale(3.5)">' + CROWN_BODY + '</g>'
+    + spark(48, 34, 1.7, 0) + spark(194, 26, 1.2, .7) + spark(176, 88, 1.5, 1.3) + spark(66, 86, 1, 2) + spark(212, 66, .9, 1.9) + '</svg>';
+  const I = {
+    ads: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 15l2-6 2 6M8.7 13h2.6"/><path d="M4 4l16 16"/>',
+    chars: '<path d="M4 6h16M4 12h16M4 18h10"/>',
+    notes: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
+    theme: '<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>',
+    photo: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',
+    support: '<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><path d="M4 14h3v5H5a1 1 0 0 1-1-1zM20 14h-3v5h2a1 1 0 0 0 1-1z"/><path d="M20 19a3 3 0 0 1-3 3h-3"/>',
+    appt: '<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/><path d="M9 15l2 2 4-4"/>',
+    chat: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/>',
+    cal1: '<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/><circle cx="12" cy="15.5" r="1.7" fill="currentColor"/>',
+    cal3: '<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="12" cy="15.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"/>',
+    gem: '<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l-2 6 5 12 5-12-2-6"/>'
+  };
+  const svg = (k) => '<svg viewBox="0 0 24 24" aria-hidden="true">' + I[k] + '</svg>';
+  const ico = (k, cls) => '<span class="vip-ico ' + (cls || '') + '">' + svg(k) + '</span>';
+  const mailTo = (subject, body) => {
+    const a = document.createElement('a');
+    a.href = 'mailto:' + FEEDBACK_EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    a.style.display = 'none';
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+
+  /* ---------- 3. STYLES ---------- */
+  const st = document.createElement('style');
+  st.textContent = `
+    .crown-btn svg { width: 24px; height: 24px; stroke: none; filter: drop-shadow(0 0 5px rgba(251,191,36,.55)); }
+    .crown-btn.is-vip { background: rgba(251,191,36,.16); }
+    .vip-art { display: block; width: 100%; max-width: 170px; height: auto; margin: 0 auto; stroke: none; fill: none; }
+    .vip-art, .vip-art * { stroke-width: inherit; }
+    .vip-spark { transform-box: fill-box; transform-origin: center; animation: vipTw 2.8s ease-in-out infinite; }
+    @keyframes vipTw { 50% { opacity: .3; transform: scale(.65); } }
+    .vip-hero { text-align: center; padding: 0 0 14px; }
+    .vip-hero-title { font-family: var(--font-serif); font-size: 24px; font-weight: 600; margin-top: 2px; }
+    .vip-hero p { margin: 6px 0 0; font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .vip-ico { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; flex: none; background: linear-gradient(135deg, rgba(251,191,36,.28), rgba(251,191,36,.08)); color: #b45309; border: 1px solid rgba(245,179,1,.35); }
+    .vip-ico svg { width: 20px; height: 20px; stroke-width: 1.8; }
+    .vip-ico.sm { width: 32px; height: 32px; border-radius: 10px; } .vip-ico.sm svg { width: 17px; height: 17px; }
+    html[data-theme="coal"] .vip-ico, html[data-vip-theme="1"] .vip-ico { color: #fbbf24; }
+    .vip-list { list-style: none; margin: 0 0 4px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .vip-list li { display: flex; align-items: center; gap: 12px; padding: 8px 12px 8px 8px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); font-size: 14.5px; font-weight: 500; }
+    .vip-cap { font-size: 12px; font-weight: 700; color: var(--muted); margin: 0 0 8px; }
+    .vip-plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
+    .vip-plan { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 4px 10px; text-align: center; border: 1px solid var(--line-strong); border-radius: 16px; background: var(--surface); color: var(--ink); transition: border-color .2s, background .2s, box-shadow .2s; }
+    .vip-plan[aria-checked="true"] { border-color: #f5b301; background: linear-gradient(160deg, rgba(251,191,36,.24), rgba(251,191,36,.04)); box-shadow: 0 0 0 1px #f5b301; }
+    .vip-plan > b { font-size: 13px; }
+    .vip-plan-p { display: flex; flex-direction: column; align-items: center; line-height: 1.2; }
+    .vip-plan-p b { font-size: 18px; } .vip-plan-p small { font-size: 11px; color: var(--muted); font-weight: 500; } .vip-plan-p s { font-size: 11.5px; color: var(--muted); }
+    .vip-cap { font-size: 12px; font-weight: 700; color: var(--muted); margin: 22px 0 8px; }
+    .vip-promo { display: flex; gap: 8px; margin-bottom: 4px; }
+    .vip-promo input { flex: 1; min-width: 0; }
+    .vip-pay { width: 100%; padding: 14px; font-size: 15px; margin-top: 14px; background: linear-gradient(135deg, #fde68a, #f5b301 55%, #d98e04); color: #2a1a00; box-shadow: 0 6px 18px -6px rgba(217,142,4,.7); }
+    .vip-or { margin: 20px 0 8px; font-size: 13px; color: var(--muted); text-align: center; }
+    .vip-msg { min-height: 18px; margin-top: 12px; font-size: 13px; font-weight: 600; text-align: center; color: var(--muted); line-height: 1.4; }
+    .vip-msg.err { color: var(--danger); } .vip-msg.ok { color: #10b981; }
+    .vip-perks { display: flex; flex-direction: column; gap: 10px; }
+    .vip-perks .btn { gap: 10px; justify-content: flex-start; } .vip-perks .btn svg { width: 18px; height: 18px; }
+    .vip-pill { font-size: 9px; font-weight: 800; letter-spacing: .08em; padding: 2px 6px; border-radius: 99px; background: #fbbf24; color: #2a1a00; }
+    .vip-theme-btn { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .vip-theme-btn svg { width: 18px; height: 18px; stroke: none; }
+    .add-photo-btn { margin-top: 14px; align-self: flex-start; gap: 8px; }
+    .add-photo-btn svg { width: 16px; height: 16px; }
+    html[data-vip-theme="1"] { --paper: #0c0a05; --surface: #15110a; --surface-2: #1e1810; --ink: #fff4d6; --ink-2: #e9d9a6; --muted: #a8975f; --line: #33290f; --line-strong: #54421a; --accent: #f5b301; --accent-soft: rgba(245,179,1,.16); --danger: #f87171; --shadow: 0 4px 12px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.6); color-scheme: dark; }
+    html[data-vip-theme="1"] .fab, html[data-vip-theme="1"] .btn.primary, html[data-vip-theme="1"] .ai-msg.user, html[data-vip-theme="1"] .todo-row.is-done .check { color: #2a1a00; }
+    html[data-vip-theme="1"] .fab:hover { background: #d98e04; }
+    html[data-vip-theme="1"] .fab.is-open { color: var(--ink); background: var(--surface); }
+  `;
+  document.head.appendChild(st);
+
+  // Shared gold gradient used by every crown.
+  const sprite = document.createElement('div');
+  sprite.innerHTML = '<svg width="0" height="0" style="position:absolute;width:0;height:0" aria-hidden="true" focusable="false"><defs><linearGradient id="vipGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset=".5" stop-color="#f5b301"/><stop offset="1" stop-color="#c77700"/></linearGradient></defs></svg>';
+  document.body.appendChild(sprite);
+
+  /* ---------- 4. CROWN BUTTON (beside Feedback & Support) ---------- */
+  const fbBtn = $('btnSidebarFeedback');
+  const crown = document.createElement('button');
+  crown.type = 'button'; crown.id = 'btnSidebarVip'; crown.className = 'icon-btn crown-btn';
+  crown.title = 'VIP'; crown.setAttribute('aria-label', 'VIP'); crown.innerHTML = CROWN;
+  fbBtn.parentNode.insertBefore(crown, fbBtn);
+
+  /* ---------- 5. VIP POPUP ---------- */
+  const perks = [['ads', 'Ad-free experience'], ['chars', '100,000 characters'], ['notes', '50 notes'], ['theme', 'VIP Gold theme'], ['photo', 'Upload your photos to your notes'], ['support', 'Priority customer support'], ['appt', 'Priority appointments'], ['chat', 'Direct VIP communication']];
+  const dlg = document.createElement('dialog');
+  dlg.className = 'modal'; dlg.id = 'vipModal'; dlg.setAttribute('aria-labelledby', 'vipTitle');
+  dlg.innerHTML = `
+    <header class="modal-header"><h2 id="vipTitle">Ink-Lite VIP</h2>
+      <button type="button" class="icon-btn" data-vip-close aria-label="Close">${ICONS.close}</button></header>
+    <div class="modal-body">
+      <div class="vip-hero">${HERO}<div class="vip-hero-title" id="vipHeroTitle"></div><p id="vipHeroSub"></p></div>
+      <div id="vipBuy">
+        <div class="vip-plans" id="vipPlans" role="radiogroup" aria-label="Plan"></div>
+        <div class="vip-promo"><input type="text" class="fb-input" id="vipPromo" placeholder="Discount code" autocomplete="off" autocapitalize="characters" spellcheck="false"><button type="button" class="btn ghost" id="vipApply">Apply</button></div>
+        <button type="button" class="btn vip-pay" id="vipPay"></button>
+      </div>
+      <div class="vip-msg" id="vipMsg" aria-live="polite"></div>
+      <div class="vip-perks" id="vipPerks" hidden>
+        <button type="button" class="btn primary" data-perk="support">${svg('support')}<span>Priority support</span></button>
+        <button type="button" class="btn ghost" data-perk="appointment">${svg('appt')}<span>Book a priority appointment</span></button>
+        <button type="button" class="btn ghost" data-perk="direct">${svg('chat')}<span>Message us directly</span></button>
+      </div>
+      <div class="vip-cap">What you get</div>
+      <ul class="vip-list">${perks.map((p) => '<li>' + ico(p[0], 'sm') + '<span>' + p[1] + '</span></li>').join('')}</ul>
+      <div id="vipAct">
+        <div class="vip-or">Already paid? Enter your VIP code</div>
+        <input type="text" class="fb-input" id="vipCode" placeholder="VIP code" autocomplete="off" autocapitalize="characters" spellcheck="false">
+        <button type="button" class="btn ghost" id="vipActivate" style="width:100%;margin-top:10px;">Activate VIP</button>
+      </div>
+    </div>`;
+  document.body.appendChild(dlg);
+
+  const msg = (t, kind) => { const m = $('vipMsg'); m.textContent = t || ''; m.className = 'vip-msg' + (kind ? ' ' + kind : ''); if (t) { try { m.scrollIntoView({ block: 'nearest' }); } catch (e) {} } };
+  let plan = 'monthly', disc = null;   // disc = { pct, code } (kept in memory only)
+  const cur = () => PLANS.find((p) => p.id === plan) || PLANS[0];
+  const final = (c) => (disc ? Math.round(c * (100 - disc.pct) / 100) : c);
+
+  function renderPlans() {
+    $('vipPlans').innerHTML = PLANS.map((p) =>
+      '<button type="button" class="vip-plan" role="radio" data-plan="' + p.id + '" aria-checked="' + (p.id === plan) + '">' + ico(p.ico, 'sm') +
+      '<b>' + p.name + '</b><span class="vip-plan-p">' + (disc ? '<s>' + money(p.cents) + '</s>' : '') + '<b>' + money(final(p.cents)) + '</b><small>' + p.tag + '</small></span></button>').join('');
+    $('vipPlans').querySelectorAll('[data-plan]').forEach((b) => { b.onclick = () => { plan = b.dataset.plan; renderPlans(); }; });
+    const c = cur();
+    $('vipPay').textContent = 'Pay ' + money(final(c.cents)) + (c.per ? ' ' + c.per : '');
+  }
+
+  /* ---------- 6. APPEARANCE: VIP Gold theme button ---------- */
+  const grid = document.querySelector('#settings-appearance .option-grid');
+  const themeBtn = document.createElement('button');
+  themeBtn.type = 'button'; themeBtn.id = 'btnVipTheme'; themeBtn.className = 'option-btn vip-theme-btn';
+  themeBtn.setAttribute('aria-pressed', 'false');
+  grid.appendChild(themeBtn);
+
+  function refresh() {
+    const vip = isVip();
+    crown.classList.toggle('is-vip', vip);
+    $('vipHeroTitle').textContent = vip ? 'You are a VIP client' : 'Become a VIP client';
+    $('vipHeroSub').textContent = vip ? 'All VIP features are unlocked on this device.' : 'Unlock everything below with one secure payment.';
+    $('vipBuy').hidden = vip; $('vipAct').hidden = vip; $('vipPerks').hidden = !vip;
+    renderPlans();
+    const on = vip && state.prefs.vipTheme === true;
+    themeBtn.innerHTML = CROWN + '<span>VIP Gold</span>' + (vip ? '' : '<span class="vip-pill">VIP</span>');
+    themeBtn.setAttribute('aria-pressed', String(on));
+  }
+
+  function setVip(on) {
+    state.prefs.vip = on;
+    if (on) state.prefs.vipSince = Date.now(); else state.prefs.vipTheme = false;
+    persist(); applyPrefs(); updateCharCount(); refresh();
+    if (getActive()) renderEditor(true);
+  }
+
+  function openVip() { refresh(); msg(''); if (!dlg.open) dlg.showModal(); }
+
+  /* ---------- 7. WIRING ---------- */
+  crown.onclick = openVip;
+  dlg.querySelectorAll('[data-vip-close]').forEach((b) => { b.onclick = () => dlg.close(); });
+  dlg.onclick = (e) => { if (e.target === dlg) dlg.close(); };
+
+  $('vipApply').onclick = async () => {
+    const code = $('vipPromo').value.trim().toUpperCase();
+    if (!code) { disc = null; renderPlans(); msg(''); return; }
+    if (!HAS_SUBTLE) { msg('Discount codes need a secure (https) page.', 'err'); return; }
+    const pct = DISCOUNT_HASHES[await sha(code)];
+    if (pct) { disc = { pct, code }; renderPlans(); msg(pct + '% off applied.', 'ok'); }
+    else { disc = null; renderPlans(); msg('That code is not valid.', 'err'); }
+  };
+
+  $('vipPay').onclick = () => {
+    const url = VIP_PAYMENT_URLS[plan];
+    if (!url || /REPLACE_WITH/.test(url)) { msg('Payment is not connected yet. Add your payment links in the add-on settings.', 'err'); return; }
+    let target = url;
+    try { const u = new URL(url); if (disc && /(^|\.)stripe\.com$/.test(u.hostname)) u.searchParams.set('prefilled_promo_code', disc.code); target = u.toString(); } catch (e) {}
+    const w = window.open(target, '_blank', 'noopener');
+    if (!w) location.href = target;
+    msg('After you pay, you receive your VIP code. Enter it below to activate.');
+  };
+
+  $('vipActivate').onclick = async () => {
+    const code = $('vipCode').value.trim().toUpperCase();
+    if (!code) { msg('Enter your VIP code.', 'err'); return; }
+    if (!HAS_SUBTLE) { msg('Activation needs a secure (https) page.', 'err'); return; }
+    if (VIP_CODE_HASHES.includes(await sha(code))) { $('vipCode').value = ''; setVip(true); msg('VIP activated. Welcome!', 'ok'); }
+    else msg('That code is not valid.', 'err');
+  };
+
+  dlg.querySelectorAll('[data-perk]').forEach((b) => {
+    b.onclick = () => {
+      const k = b.dataset.perk;
+      if (k === 'support') mailTo('[VIP PRIORITY] Support request', 'Describe your problem:\n\n\n-- Sent from Ink-Lite VIP');
+      else if (k === 'appointment') mailTo('[VIP] Priority appointment request', 'Preferred date and time:\nTopic:\n\n-- Sent from Ink-Lite VIP');
+      else mailTo('[VIP] Direct message', 'Your message:\n\n\n-- Sent from Ink-Lite VIP');
+    };
+  });
+
+  themeBtn.onclick = () => {
+    if (!isVip()) { openVip(); return; }
+    state.prefs.vipTheme = !state.prefs.vipTheme;
+    persist(); applyPrefs(); refresh();
+  };
+  // Picking Aurora Lite / Coal Dark turns the gold theme off (runs before the app's own handler).
+  document.querySelectorAll('.option-btn[data-theme]').forEach((b) => b.addEventListener('click', () => { state.prefs.vipTheme = false; }));
+
+  // Note limit: free users hit 35 -> VIP popup; VIP users may create up to 50.
+  document.querySelectorAll('#fabMenu [data-action]').forEach((btn) => btn.addEventListener('click', (e) => {
+    const n = state.notes.length;
+    if (n < 35) return;
+    e.stopImmediatePropagation();
+    $('fabMenu').classList.remove('is-open'); $('btnAdd').classList.remove('is-open');
+    if (!isVip()) { openVip(); return; }
+    if (n >= maxNotes()) { alert('Maximum ' + maxNotes() + ' notes reached.'); return; }
+    const note = { id: uid(), type: btn.dataset.action, title: '', body: '', items: [], pinned: false, locked: false, updatedAt: Date.now(), images: [] };
+    state.notes.unshift(note); state.activeId = note.id;
+    persist(); renderList(); renderEditor();
+  }));
+
+  /* ---------- 8. PATCH EXISTING APP FUNCTIONS ---------- */
+  const _apply = applyPrefs;
+  applyPrefs = function () {
+    _apply.apply(this, arguments);
+    try {
+      const on = isVip() && state.prefs.vipTheme === true;
+      if (on) root.dataset.vipTheme = '1'; else delete root.dataset.vipTheme;
+      if (on) document.querySelectorAll('.option-btn[data-theme]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      themeBtn.setAttribute('aria-pressed', String(on));
+      crown.classList.toggle('is-vip', isVip());
+    } catch (e) { console.warn('VIP theme', e); }
+  };
+
+  const _count = updateCharCount;
+  updateCharCount = function () {
+    _count.apply(this, arguments);
+    try {
+      const c = $('charDesc'), n = $('notesStorageDesc');
+      if (c) c.textContent = c.textContent.replace(/\/ .*? chars used/, '/ ' + maxChars().toLocaleString() + ' chars used');
+      if (n) n.textContent = n.textContent.replace(/\/ \d+ notes used/, '/ ' + maxNotes() + ' notes used');
+    } catch (e) { console.warn('VIP counts', e); }
+  };
+
+  const _ff = feedbackFields;
+  feedbackFields = function (entry) {
+    const f = _ff.apply(this, arguments);
+    try { if (root.dataset.beta === '1') f._subject = '[BETA SUPPORT] ' + f._subject; if (isVip()) f._subject = '[VIP PRIORITY] ' + f._subject; } catch (e) {}
+    return f;
+  };
+
+  // One permanent hidden file input (phones block inputs that are created on the fly).
+  const photoInput = document.createElement('input');
+  photoInput.oncancel = () => { window.__inkPicking = 0; };
+  photoInput.type = 'file'; photoInput.accept = 'image/*'; photoInput.multiple = true; photoInput.id = 'vipPhotoInput';
+  photoInput.tabIndex = -1; photoInput.setAttribute('aria-hidden', 'true');
+  photoInput.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none;';
+  document.body.appendChild(photoInput);
+  let photoNoteId = null;
+  const toast = (t) => { const el = $('saveStatus'); if (el) { el.textContent = t; setTimeout(() => { if (el.isConnected) el.textContent = 'Saved'; }, 2800); } };
+  const readPhoto = (file) => new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, 1000 / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(img.width * k)); c.height = Math.max(1, Math.round(img.height * k));
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL('image/jpeg', 0.72));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('unreadable')); };
+    img.src = url;
+  });
+  photoInput.onchange = async () => {
+    const files = [...photoInput.files];
+    photoInput.value = ''; window.__inkPicking = 0;
+    const note = state.notes.find((n) => n.id === photoNoteId);
+    if (!note || !files.length) return;
+    let added = 0, failed = 0;
+    for (const f of files) {
+      if ((note.images || []).length >= MAX_PHOTOS) { toast('Maximum ' + MAX_PHOTOS + ' photos per note'); break; }
+      try { (note.images = note.images || []).push(await readPhoto(f)); added++; } catch (e) { failed++; }
+    }
+    if (added) { touch(); persist(); renderEditor(true); setTimeout(() => { const g = document.querySelector('.editor-body img:last-of-type'); if (g) g.scrollIntoView({ block: 'nearest' }); }, 60); }
+    if (failed) toast('That photo could not be read');
+  };
+  function pickPhoto(note) {
+    if ((note.images || []).length >= MAX_PHOTOS) { toast('Maximum ' + MAX_PHOTOS + ' photos per note'); return; }
+    photoNoteId = note.id; window.__inkPicking = Date.now();
+    photoInput.click();   // runs inside the tap, so the phone opens your gallery
+  }
+
+  const _render = renderEditor;
+  renderEditor = function (keep) {
+    _render.apply(this, arguments);
+    try {
+      const note = getActive();
+      if (!note || note.type !== 'note') return;
+      const ta = document.querySelector('.editor .body-input');
+      if (ta) ta.maxLength = maxChars();
+      const bar = document.querySelector('.editor .editor-bar'), pin = $('btnPin');
+      if (!bar || !pin || note.locked || $('btnAddPhoto')) return;
+      const b = document.createElement('button');
+      b.type = 'button'; b.id = 'btnAddPhoto'; b.className = 'icon-btn';
+      b.title = 'Add photo'; b.setAttribute('aria-label', 'Add photo'); b.innerHTML = svg('photo');
+      b.onclick = () => { if (!isVip()) { openVip(); return; } pickPhoto(note); };
+      bar.insertBefore(b, pin);   // sits just left of the pin
+    } catch (e) { console.warn('VIP editor', e); }
+  };
+
+
+  /* ---------- ADS: shown to free users only, removed the moment VIP is active ---------- */
+  // Fill these in from your Google AdSense account (adsense.google.com).
+  // While they still contain XXXX, a visible "Ad space (test)" box is shown instead of real ads.
+  const AD_CONFIG = { client: 'ca-pub-2133637004786820', slot: 'XXXXXXXXXX' };
+  const adReady = !/X{4}/.test(AD_CONFIG.client + AD_CONFIG.slot);
+  const adCss = document.createElement('style');
+  adCss.textContent = '#adBox{margin:0 0 12px;min-height:60px;max-height:110px;overflow:hidden;border:1px solid var(--line);border-radius:12px;background:var(--surface);position:relative;display:grid;place-items:center;font-size:12px;color:var(--muted)}#adBox small{position:absolute;top:3px;left:8px;font-size:9px;letter-spacing:.08em;text-transform:uppercase}#adBox ins{width:100%}';
+  document.head.appendChild(adCss);
+  let adBox = null, adScriptLoaded = false;
+  function syncAds() {
+    if (isVip()) { if (adBox) { adBox.remove(); adBox = null; } return; }   // VIP = ad-free
+    if (adBox) return;
+    const foot = document.querySelector('.sidebar-foot');
+    if (!foot) return;
+    adBox = document.createElement('div');
+    adBox.id = 'adBox'; adBox.setAttribute('aria-label', 'Advertisement');
+    foot.insertBefore(adBox, foot.firstChild);   // inside the footer, so the + button keeps its spacing
+    if (!adReady) { adBox.innerHTML = '<small>Ad</small><span>Ad space (test)</span>'; return; }
+    if (!adScriptLoaded && !document.querySelector('script[src*="adsbygoogle.js"]')) {
+      const sc = document.createElement('script');
+      sc.async = true; sc.crossOrigin = 'anonymous';
+      sc.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + AD_CONFIG.client;
+      document.head.appendChild(sc); adScriptLoaded = true;
+    }
+    adBox.innerHTML = '<small>Ad</small><ins class="adsbygoogle" style="display:block;width:100%;height:90px" data-ad-client="' + AD_CONFIG.client + '" data-ad-slot="' + AD_CONFIG.slot + '" data-ad-format="horizontal"></ins>';
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
+  }
+  const _applyAds = applyPrefs;
+  applyPrefs = function () { _applyAds.apply(this, arguments); try { syncAds(); } catch (e) {} };
+
+  /* The app already started (this block sits below boot()), so apply VIP state once now. */
+  refresh();
+  applyPrefs();
+  syncAds();
+  updateCharCount();
+  const appEl2 = $('app'), wasViewing = appEl2.classList.contains('viewing');
+  if (getActive()) { renderEditor(true); if (!wasViewing) appEl2.classList.remove('viewing'); }
+ } catch (err) {
+  console.warn('Ink-Lite VIP add-on could not start (the app itself is unaffected):', err);
+ }
+})();
+
+  window.__ink = { state, getActive, touch, persist, renderList, applyPrefs: () => applyPrefs(), render: (k) => renderEditor(k) };
+})();
+</script>
+
+<script>
+(function(){
+'use strict';
+const K='ink-lite.beta.v1',MAIL='super.kennz@yahoo.com',$=id=>document.getElementById(id),root=document.documentElement;
+let S={};try{S=JSON.parse(localStorage.getItem(K)||'{}')||{}}catch{}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch{}};
+const on=()=>!!S.enabled;
+const LOAD_MS=300000;
+if(S.pkgAt&&!S.enabled&&Date.now()-S.pkgAt>=LOAD_MS){S.enabled=1;S.manualSeen=0;save()}
+const sync=()=>{if(on())root.dataset.beta='1';else delete root.dataset.beta;const v=document.querySelector('.sidebar-foot span');if(v)v.textContent=on()?'V1.3 Beta':'V1.3';
+ const T=(sel,t)=>{const e=document.querySelector(sel);if(e)e.textContent=t},bm=document.querySelector('.brand-mark');
+ if(bm){bm.textContent=on()?'Beta Ink-Lite':'Ink-Lite';bm.classList.toggle('bx-flow',on())}
+ T('.loader-mark',on()?'Beta Ink-Lite':'Ink-Lite');T('.brand-sub',on()?'BETA-NOTE':'Notebook');T('#feedbackTitle',on()?'Beta Support':'Feedback & Support');
+ const fb=$('btnSidebarFeedback');if(fb){const n=on()?'Beta Support':'Feedback & Support';fb.title=n;fb.setAttribute('aria-label',n)}
+ withInk(k=>{const p=k.state.prefs;if(on()&&p.theme!=='nebula'){p.theme='nebula';p.vipTheme=false;k.applyPrefs();k.persist()}else if(!on()&&p.theme==='nebula'){p.theme='light';k.applyPrefs();k.persist()}})};
+const withInk=f=>window.__ink?f(window.__ink):addEventListener('DOMContentLoaded',()=>window.__ink&&f(window.__ink));
+sync();
+const GM=/^[a-z0-9._%+-]+@(gmail|googlemail)\.com$/i;
+const mail=(s,b)=>{location.href='mailto:'+MAIL+'?subject='+encodeURIComponent(s)+'&body='+encodeURIComponent(b)};
+
+/* ---- No zoom. Copy / paste only inside the editor ---- */
+['gesturestart','gesturechange','gestureend'].forEach(e=>document.addEventListener(e,x=>x.preventDefault(),{passive:false}));
+document.addEventListener('touchmove',e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});
+document.addEventListener('wheel',e=>{if(e.ctrlKey)e.preventDefault()},{passive:false});
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['+','-','=','0'].includes(e.key))e.preventDefault()});
+['copy','cut','paste','contextmenu','dragstart'].forEach(ev=>document.addEventListener(ev,e=>{if(!(e.target.closest&&e.target.closest('.editor')))e.preventDefault()},true));
+
+/* ---- Editor: keyboard strip fix + Beta pencil ---- */
+const PEN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+function decorate(){
+ const ed=document.querySelector('.editor');if(!ed)return;
+ const fields=[...ed.querySelectorAll('.sheet input,.sheet textarea')];
+ fields.forEach(el=>{if(el.dataset.fx)return;el.dataset.fx='1';
+  el.setAttribute('autocomplete','off');el.setAttribute('autocorrect','off');el.setAttribute('spellcheck','false');
+  if(ed.dataset.viewing==='1')el.setAttribute('readonly','')});
+ if(!on())return;
+ const bar=ed.querySelector('.editor-bar');if(!bar||bar.querySelector('#btnBetaEdit')||ed.querySelector('.unlock-banner'))return;
+ const title=ed.querySelector('.title-input');
+ const empty=fields.every(f=>!(f.value||'').trim());
+ const b=document.createElement('button');b.className='icon-btn';b.id='btnBetaEdit';b.title='Edit note';b.setAttribute('aria-label','Edit note');b.innerHTML=PEN;
+ bar.appendChild(b);ed.dataset.viewing='1';fields.forEach(f=>f.setAttribute('readonly',''));
+ b.onclick=()=>openEditor();
+ withInk(k=>{const n=k.getActive();if(n&&!n.locked&&empty&&autoOpened!==n.id){autoOpened=n.id;openEditor()}});
+}
+let autoOpened=null;
+function openEditor(){withInk(k=>{const n=k.getActive();if(!n||n.locked||document.querySelector('.bx-edit'))return;
+ const todo=n.type==='todo',d=document.createElement('div');d.className='bx-edit';
+ d.innerHTML='<div class="bx-edit-bar"><b>Editor</b><button type="button" id="bxDone">Done</button></div><div class="bx-edit-body"><input id="bxT" placeholder="Title" maxlength="200" autocomplete="off">'+(todo?'<div class="bx-edit-hint">One item per line.</div>':'')+'<textarea id="bxB" placeholder="'+(todo?'Add items…':'Start writing…')+'"></textarea></div>';
+ document.body.appendChild(d);
+ const t=d.querySelector('#bxT'),bd=d.querySelector('#bxB');t.value=n.title||'';
+ bd.value=todo?(n.items||[]).map(i=>i.text).join('\n'):(n.body||'');if(!todo)bd.maxLength=100000;
+ t.oninput=()=>{n.title=t.value;k.touch();k.renderList()};
+ bd.oninput=()=>{if(todo){const old=n.items||[];n.items=bd.value.split('\n').map((x,i)=>({id:(old[i]&&old[i].id)||('i'+Date.now().toString(36)+i),text:x,done:!!(old[i]&&old[i].done&&old[i].text===x)}))}else n.body=bd.value;k.touch();k.renderList()};
+ d.querySelector('#bxDone').onclick=()=>{document.activeElement&&document.activeElement.blur();k.persist();d.remove();k.render(true)};
+ setTimeout(()=>{(n.title?bd:t).focus()},280)})}
+new MutationObserver(decorate).observe(document.getElementById('main'),{childList:true,subtree:true});
+
+/* ---- Beta page ---- */
+let shot=null,tick=null;
+function render(){
+ const body=$('betaBody');if(!body)return;clearInterval(tick);
+ if(S.enabled){
+  body.innerHTML='<div class="bx-card"><span class="bx-tag">V1.3 BETA</span><h3>Beta is active</h3><p>Liquid Glass PIN, Beta loading screen, manual, pencil editor and the PIN reset with evidence are on.</p><button class="bx-btn" id="bxMan">Open Beta Manual</button><button class="bx-btn ghost" id="bxOff">Leave Beta</button></div>';
+  $('bxMan').onclick=()=>manual();
+  $('bxOff').onclick=()=>{if(confirm('Leave the Beta experience?')){S={};save();sync();render()}};return}
+ if(S.pkgAt){
+  body.innerHTML='<div class="bx-card"><span class="bx-tag">BETA EXP</span><h3>Loading the package…</h3><p>Keep going with the app. Beta turns on by itself when the package is ready.</p><div class="bx-bar ind"><i></i></div></div>';
+  tick=setInterval(()=>{if(Date.now()-S.pkgAt>=LOAD_MS){S.enabled=1;S.manualSeen=0;save();sync();render();manual()}},2000);return}
+ if(!S.joinAt){
+  body.innerHTML='<div class="bx-card"><span class="bx-tag">BETA EXP</span><h3>What is Beta?</h3><p>Beta is an experiment to join the Inter-World, and approve your satisfaction.</p><p>The original doesn\'t have these:</p><ul><li>Professional Liquid Glass PIN lock</li><li>PIN reset with evidence</li><li>Beta loading screen and manual</li><li>Pencil button to edit notes</li></ul><p>To get the Beta you need permission from '+MAIL+'.</p><button class="bx-btn" id="bxJoin">Join The Experience</button></div>';
+  $('bxJoin').onclick=()=>{S.joinAt=Date.now();save();render();mail('Beta EXP Permission','Hi Kennz, I am asking permission to join the Ink-Lite Beta Experience (V1.3).')};return}
+ body.innerHTML='<div class="bx-card"><span class="bx-tag">APPLICANT</span><h3>1. Apply for registration</h3><p>Message '+MAIL+'. He gives you a link: open it, tap Join and apply for registration, then wait until '+MAIL+' approves it.</p><button class="bx-btn ghost" id="bxMsg">Message super.kennz@yahoo.com</button><label class="bx-chk"><input type="checkbox" id="bxA1">I applied and I am waiting for / received approval</label></div>'+
+ '<div class="bx-card"><span class="bx-tag">2ND APPLICANT</span><h3>2. Send your approval</h3><p>After '+MAIL+' approves it, he gives you another link. Click it: it shows an Approved BETA. Screenshot it, come back to Beta EXP in Settings and send the approval to Kennz Support and Fiber Support.</p><label class="bx-chk"><input type="checkbox" id="bxA2">My link shows Approved BETA</label><input type="file" id="bxShot" accept="image/*" style="font-size:13px;width:100%"><label class="bx-chk"><input type="checkbox" id="bxAg">I agree to send the approved screenshot to Kennz Support and Fiber Support</label><button class="bx-btn ghost" id="bxK">Send to Kennz Support</button><button class="bx-btn ghost" id="bxF">Send to Fiber Support</button></div><button class="bx-btn" id="bxGo">Get the Beta</button>';
+ ['bxA1','bxA2','bxAg'].forEach(i=>{$(i).checked=!!S[i];$(i).onchange=()=>{S[i]=$(i).checked;save();upd()}});
+ const upd=()=>{const ok=S.bxA1&&S.bxA2&&S.bxAg&&shot;$('bxK').disabled=$('bxF').disabled=!ok;$('bxGo').disabled=!(ok&&S.sentK&&S.sentF)};
+ $('bxShot').onchange=e=>{shot=e.target.files[0]||null;upd()};
+ $('bxMsg').onclick=()=>mail('Beta EXP Applicant','Hi Kennz, I would like to join the Ink-Lite Beta Experience (V1.3).');
+ $('bxK').onclick=async()=>{try{if(navigator.canShare&&navigator.canShare({files:[shot]}))await navigator.share({files:[shot],title:'Approved BETA',text:'Approved BETA screenshot for '+MAIL});else mail('Approved BETA','Approved BETA screenshot attached (please attach the screenshot).');S.sentK=1;save()}catch{}upd()};
+ $('bxF').onclick=()=>{S.sentF=1;save();supportOpen();upd()};
+ $('bxGo').onclick=()=>{S.pkgAt=Date.now();save();render()};
+ upd();
+}
+const supportOpen=()=>{const b=$('btnSidebarFeedback');b&&b.click()};
+
+/* ---- Overlays: loading, manual, PIN reset applicant ---- */
+const ov=h=>{const d=document.createElement('div');d.className='bx-ov';d.innerHTML=h;document.body.appendChild(d);return d};
+const close=d=>{d.classList.add('out');setTimeout(()=>d.remove(),400)};
+function manual(){
+ const P=[['Welcome to Beta Ink-Lite','V1.3 Beta. These features are only here, not in the original.'],
+ ['Nebula theme','The Beta loading screen is now your home screen theme. It replaces Aurora Lite and Coal Dark while Beta is on.'],
+ ['Liquid Glass PIN','A frosted-glass keypad on a soft nebula glow. Five wrong tries trigger a timed lockout.'],
+ ['Beta Ink-Lite and Beta-Note','The app name and the notebook label change while Beta is on. Leave Beta and they switch back.'],
+ ['Pencil editor','Notes open in read mode. Tap the pencil to open the Editor. The keyboard opens there, not on the note. Tap Done to return.'],
+ ['Beta Support','The chat icon is now Beta Support. Beta messages are marked and answered first.'],
+ ['Photos','VIP can add photos to notes with the picture button. Photos stay visible in the note, and the app no longer locks while you pick one.'],
+ ['Biometric unlock','Add it in Settings, Security. It needs your Ink-Lite https link and a fingerprint or face unlock set up on the phone.'],
+ ['PIN reset application','Forgot your PIN? Send a reset application with your Gmail and evidence to Fiber Support.'],
+ ['Beta EXP','Open this manual again, or leave Beta, in Settings, Beta EXP.']];
+ const d=ov('<div class="bx-man"><div class="bx-track">'+P.map(p=>'<div class="bx-slide"><h2>'+p[0]+'</h2><p>'+p[1]+'</p></div>').join('')+'</div><div class="bx-dots">'+P.map(()=>'<b></b>').join('')+'</div><div class="bx-row"><button id="bmS">Skip</button><button id="bmN">Next</button></div></div>');
+ let i=0;const tr=d.querySelector('.bx-track'),dots=[...d.querySelectorAll('.bx-dots b')],n=$('bmN')||d.querySelector('#bmN');
+ const go=k=>{i=Math.max(0,Math.min(P.length-1,k));tr.style.transform='translateX('+(-i*100)+'%)';dots.forEach((x,j)=>x.classList.toggle('on',j===i));d.querySelector('#bmN').textContent=i===P.length-1?'Done':'Next'};
+ const done=()=>{S.manualSeen=1;save();close(d)};
+ d.querySelector('#bmN').onclick=()=>i===P.length-1?done():go(i+1);d.querySelector('#bmS').onclick=done;
+ let x0=0;d.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});d.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40)go(i+(dx<0?1:-1))});
+ go(0);
+}
+if(on()&&!S.manualSeen)setTimeout(manual,2600);
+
+const SUPSVG='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M3 14h3a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H5a2 2 0 0 1-2-2z"/><path d="M21 14h-3a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h1a2 2 0 0 0 2-2z"/><path d="M21 17v1a3 3 0 0 1-3 3h-4"/></svg>';
+document.addEventListener('click',e=>{
+ const b=e.target.closest&&e.target.closest('#btnForgotPin');if(!b||!on()||b.dataset.skip)return;
+ e.stopImmediatePropagation();e.preventDefault();
+ const ref='PR-'+Date.now().toString(36).toUpperCase();let evShot=null,evSent=false,hist=[],busy=false;
+ const d=ov('<div class="bx-form"><div class="bx-top"><h3>PIN Reset</h3><button class="bx-sup" id="prSup" aria-label="Fiber Support" title="Fiber Support">'+SUPSVG+'</button></div><p>Reference '+ref+'. Fill in your application, add evidence, and send the evidence to Fiber Support (top right).</p><input id="prN" placeholder="Full name" autocomplete="off"><input id="prG" type="email" placeholder="yourname@gmail.com" autocomplete="off"><textarea id="prR" rows="2" placeholder="Why do you need a reset?"></textarea><div class="bx-cap">Evidence (required)</div><p>Screenshot your proof, then send it to Fiber Support.</p><input type="file" id="prShot" accept="image/*" style="font-size:13px;width:100%;margin-bottom:8px"><button class="bx-btn ghost" id="prEv" disabled>Send evidence to Fiber Support</button><div class="bx-err" id="prE"></div><button class="bx-btn" id="prS" disabled>Send Application</button><button class="bx-btn ghost" id="prX" disabled>Continue to standard reset</button><button class="bx-btn ghost" id="prC">Cancel</button></div>');
+ d.style.background='rgba(15,23,42,.6)';d.style.backdropFilter='blur(10px)';
+ const q=s=>d.querySelector(s),upd=()=>{q('#prEv').disabled=!evShot;q('#prS').disabled=q('#prX').disabled=!(evShot&&evSent)};
+ q('#prShot').onchange=x=>{evShot=x.target.files[0]||null;evSent=false;upd()};
+ q('#prSup').onclick=supportOpen;
+ q('#prEv').onclick=async()=>{try{if(navigator.canShare&&navigator.canShare({files:[evShot]}))await navigator.share({files:[evShot],title:'PIN reset evidence '+ref,text:'PIN reset evidence '+ref});else{supportOpen();alert('Attach or describe your evidence in Fiber Support and include reference '+ref+'.')}evSent=true}catch{}upd()};
+ q('#prC').onclick=()=>close(d);
+ q('#prX').onclick=()=>{close(d);b.dataset.skip='1';b.click();delete b.dataset.skip};
+ q('#prS').onclick=()=>{const n=q('#prN').value.trim(),g=q('#prG').value.trim(),r=q('#prR').value.trim(),er=q('#prE');
+  if(!n||!r){er.textContent='Please enter your name and reason.';return}if(!GM.test(g)){er.textContent='A Gmail address is required.';return}
+  mail('PIN Reset Application '+ref,'Reference: '+ref+'\nName: '+n+'\nGmail: '+g+'\nReason: '+r+'\nEvidence sent to Fiber Support: yes');close(d)};
+},true);
+
+document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('[data-target="beta"]'))render()});
+render();
+})();
+</script>
+</body>
+</html>
